@@ -40,7 +40,7 @@ export default function Dashboard() {
       title: "Total Santri",
       value: stats.totalSantri,
       icon: Users,
-      gradient: "from-primary to-primary-glow",
+      gradient: "from-primary to-lime",
     },
     {
       title: "Total Halaqoh",
