@@ -7,6 +7,9 @@ import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import SetoranHafalan from "./pages/SetoranHafalan";
+import TasmiMarhalah from "./pages/TasmiMarhalah";
+import RaporSemester from "./pages/RaporSemester";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +25,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/setoran" element={<SetoranHafalan />} />
+            <Route path="/tasmi" element={<TasmiMarhalah />} />
+            <Route path="/rapor" element={<RaporSemester />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
