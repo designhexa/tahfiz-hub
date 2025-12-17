@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Download, Edit, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
+import { JuzSelector } from "@/components/JuzSelector";
 
 // Mock data for setoran
 const mockSetoran = [
@@ -166,21 +167,7 @@ const SetoranHafalan = () => {
                         </Select>
                       </div>
                       
-                      <div className="space-y-2">
-                        <Label>Juz *</Label>
-                        <Select value={juz} onValueChange={setJuz}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih juz yang disetorkan" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Array.from({ length: 30 }, (_, i) => (
-                              <SelectItem key={i + 1} value={String(i + 1)}>
-                                Juz {i + 1}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      <JuzSelector value={juz} onValueChange={setJuz} required />
 
                       <div className="space-y-2">
                         <Label>Pilih Halaman *</Label>

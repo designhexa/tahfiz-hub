@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import SetoranHafalan from "./pages/SetoranHafalan";
+import AbsensiSetoran from "./pages/AbsensiSetoran";
+import LaporanHafalan from "./pages/LaporanHafalan";
 import TasmiMarhalah from "./pages/TasmiMarhalah";
 import RaporSemester from "./pages/RaporSemester";
 import NotFound from "./pages/NotFound";
@@ -25,7 +27,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/absensi" element={<AbsensiSetoran />} />
             <Route path="/setoran" element={<SetoranHafalan />} />
+            <Route path="/laporan" element={<LaporanHafalan />} />
             <Route path="/tasmi" element={<TasmiMarhalah />} />
             <Route path="/rapor" element={<RaporSemester />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
