@@ -12,6 +12,8 @@ import {
   Megaphone,
   Settings,
   LogOut,
+  Award,
+  FileSpreadsheet,
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,9 +33,10 @@ import { toast } from "sonner";
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Setoran Hafalan", url: "/setoran", icon: BookOpen },
-  { title: "Absensi", url: "/absensi", icon: UserCheck },
-  { title: "Laporan", url: "/laporan", icon: FileText },
-  { title: "Penilaian", url: "/penilaian", icon: ClipboardCheck },
+  { title: "Absensi Setoran", url: "/absensi", icon: UserCheck },
+  { title: "Rapor Semester", url: "/rapor", icon: FileSpreadsheet },
+  { title: "Laporan Hafalan", url: "/laporan", icon: FileText },
+  { title: "Tasmi' Marhalah", url: "/tasmi", icon: Award },
 ];
 
 const masterDataItems = [
