@@ -32,11 +32,11 @@ import { toast } from "sonner";
 
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Setoran Hafalan", url: "/setoran", icon: BookOpen },
   { title: "Absensi Setoran", url: "/absensi", icon: UserCheck },
-  { title: "Rapor Semester", url: "/rapor", icon: FileSpreadsheet },
+  { title: "Setoran Hafalan", url: "/setoran", icon: BookOpen },
   { title: "Laporan Hafalan", url: "/laporan", icon: FileText },
   { title: "Tasmi' Marhalah", url: "/tasmi", icon: Award },
+  { title: "Rapor Tahfidz", url: "/rapor", icon: FileSpreadsheet },
 ];
 
 const masterDataItems = [
