@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Plus, CheckCircle, Trash2, User, Calendar, BookOpen } from "lucide-react";
 import { toast } from "sonner";
+import { JuzSelector } from "@/components/JuzSelector";
 
 // Mock data
 const mockTasmiStats = {
@@ -186,22 +187,7 @@ const TasmiMarhalah = () => {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Juz *</Label>
-                  <Select value={juz} onValueChange={setJuz}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih juz yang diujikan" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 30 }, (_, i) => (
-                        <SelectItem key={i + 1} value={String(i + 1)}>
-                          {i + 1}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">Pilih juz yang diujikan</p>
-                </div>
+                <JuzSelector value={juz} onValueChange={setJuz} required />
 
                 {/* Surah Selection Card */}
                 <Card className="border-dashed border-yellow-400 bg-yellow-50/50 dark:bg-yellow-950/20">

@@ -155,16 +155,16 @@ const SetoranHafalan = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Mode Pilihan</Label>
-                        <Select value={modePilihan} onValueChange={setModePilihan}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="halaman">📖 Pilih per Halaman</SelectItem>
-                            <SelectItem value="ayat">📜 Pilih per Ayat</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Label>Mode Pilihan *</Label>
+                          <Select value={modePilihan} onValueChange={setModePilihan}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="surah">📖 Pilih per Surah & Ayat</SelectItem>
+                              <SelectItem value="halaman">📄 Pilih per Halaman</SelectItem>
+                            </SelectContent>
+                          </Select>
                       </div>
                       
                       <JuzSelector value={juz} onValueChange={setJuz} required />
