@@ -16,10 +16,6 @@ import { JuzSelector } from "@/components/JuzSelector";
 import { getSurahsByJuz } from "@/lib/quran-data";
 import { useMemo } from "react";
 
-const surahByJuz = useMemo(() => {
-  return getSurahsByJuz(formData.juz);
-}, [formData.juz]);
-
 // Mock data
 const mockTasmiStats = {
   total: 8,
