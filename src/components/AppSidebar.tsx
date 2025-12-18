@@ -68,15 +68,15 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border bg-card">
       <SidebarContent>
         {/* Header */}
-        <div className="p-4 border-b border-border">
+        <div className="p-4 bg-gradient-to-r from-primary to-lime">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-lime flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             {open && (
               <div>
-                <h2 className="font-bold text-lg text-foreground">Tahfidz App</h2>
-                <p className="text-xs text-muted-foreground">Manajemen Hafalan</p>
+                <h2 className="font-bold text-lg text-white">Sistem Tahfidz</h2>
+                <p className="text-xs text-white/80">Manajemen Hafalan</p>
               </div>
             )}
           </div>
