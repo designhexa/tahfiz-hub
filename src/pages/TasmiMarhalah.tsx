@@ -13,6 +13,12 @@ import { Progress } from "@/components/ui/progress";
 import { Plus, CheckCircle, Trash2, User, Calendar, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { JuzSelector } from "@/components/JuzSelector";
+import { getSurahsByJuz } from "@/lib/quran-data";
+import { useMemo } from "react";
+
+const surahByJuz = useMemo(() => {
+  return getSurahsByJuz(formData.juz);
+}, [formData.juz]);
 
 // Mock data
 const mockTasmiStats = {
