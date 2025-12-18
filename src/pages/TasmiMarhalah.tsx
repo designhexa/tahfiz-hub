@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { Plus, CheckCircle, Trash2, User, Calendar, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { JuzSelector } from "@/components/JuzSelector";
-import { getSurahsByJuz } from "@/lib/quran-data";
+import { getSurahsByJuz, Surah } from "@/lib/quran-data";
 import { useMemo } from "react";
 
 // Mock data
@@ -92,7 +92,7 @@ const TasmiMarhalah = () => {
   const [filterHalaqoh, setFilterHalaqoh] = useState("all");
   const [activeTab, setActiveTab] = useState("semua");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+
   // Form state
   const [selectedSantri, setSelectedSantri] = useState("");
   const [manzil, setManzil] = useState("");
@@ -104,8 +104,28 @@ const TasmiMarhalah = () => {
   const [jumlahKesalahan, setJumlahKesalahan] = useState("0");
   const [catatanTajwid, setCatatanTajwid] = useState("");
 
-  const nilaiKelancaran = Math.max(0, 100 - parseInt(jumlahKesalahan || "0"));
-  const selectedSurah = surahList.find(s => s.nomor === parseInt(surah));
+  // =========================
+  // 1️⃣ SURAH BY JUZ (DULU)
+  // =========================
+  const surahByJuz: Surah[] = useMemo(() => {
+    if (!juz) return [];
+    return getSurahsByJuz(Number(juz));
+  }, [juz]);
+
+  // =========================
+  // 2️⃣ SELECTED SURAH
+  // =========================
+  const selectedSurah = useMemo(() => {
+    return surahByJuz.find(s => s.number === Number(surah));
+  }, [surah, surahByJuz]);
+
+  // =========================
+  // 3️⃣ NILAI
+  // =========================
+  const nilaiKelancaran = Math.max(
+    0,
+    100 - parseInt(jumlahKesalahan || "0")
+  );
 
   const handleSubmit = () => {
     toast.success("Tasmi' marhalah berhasil ditambahkan!");
@@ -117,7 +137,8 @@ const TasmiMarhalah = () => {
   };
 
   const filteredData = mockTasmiData.filter(item => {
-    if (activeTab !== "semua" && `manzil${item.manzil}` !== activeTab) return false;
+    if (activeTab !== "semua" && `manzil${item.manzil}` !== activeTab)
+      return false;
     return true;
   });
 
@@ -196,47 +217,64 @@ const TasmiMarhalah = () => {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm">Surah #1</CardTitle>
                   </CardHeader>
+
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <Label>Nama Surah *</Label>
-                      <Select value={surah} onValueChange={setSurah}>
+                      <Select
+                        value={surah}
+                        onValueChange={setSurah}
+                        disabled={!juz}
+                      >
                         <SelectTrigger>
-                          <SelectValue placeholder="Pilih surah" />
+                          <SelectValue placeholder={juz ? "Pilih surah" : "Pilih juz dulu"} />
                         </SelectTrigger>
+
                         <SelectContent>
-                          {surahList.map(s => (
-                            <SelectItem key={s.nomor} value={String(s.nomor)}>
-                              {s.nomor}. {s.nama}...
+                          {surahByJuz.map((s) => (
+                            <SelectItem key={s.number} value={String(s.number)}>
+                              {s.number}. {s.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">Menampilkan surah dalam Juz {juz || "1"}</p>
+
+                      <p className="text-xs text-muted-foreground">
+                        Menampilkan surah dalam Juz {juz || "-"}
+                      </p>
                     </div>
 
                     {selectedSurah && (
                       <div className="p-2 bg-primary/10 rounded border border-primary/20">
-                        <p className="text-sm">{selectedSurah.nama} (الفاتحة) - Jumlah ayat: {selectedSurah.jumlahAyat}</p>
+                        <p className="text-sm">
+                          {selectedSurah.name} ({selectedSurah.arabicName}) – Jumlah ayat:{" "}
+                          {selectedSurah.numberOfAyahs}
+                        </p>
                       </div>
                     )}
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <Label className="text-xs">Ayat Dari *</Label>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
+                          min={1}
+                          max={selectedSurah?.numberOfAyahs}
                           value={ayatDari}
                           onChange={(e) => setAyatDari(e.target.value)}
-                          min="1"
+                          disabled={!selectedSurah}
                         />
                       </div>
+
                       <div className="space-y-1">
                         <Label className="text-xs">Ayat Sampai *</Label>
-                        <Input 
-                          type="number" 
+                        <Input
+                          type="number"
+                          min={ayatDari}
+                          max={selectedSurah?.numberOfAyahs}
                           value={ayatSampai}
                           onChange={(e) => setAyatSampai(e.target.value)}
-                          min="1"
+                          disabled={!selectedSurah}
                         />
                       </div>
                     </div>
