@@ -12,6 +12,11 @@ import AbsensiSetoran from "./pages/AbsensiSetoran";
 import LaporanHafalan from "./pages/LaporanHafalan";
 import TasmiMarhalah from "./pages/TasmiMarhalah";
 import RaporSemester from "./pages/RaporSemester";
+import DataSantri from "./pages/DataSantri";
+import DataHalaqoh from "./pages/DataHalaqoh";
+import DataUstadz from "./pages/DataUstadz";
+import DataUsers from "./pages/DataUsers";
+import Pengumuman from "./pages/Pengumuman";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +37,11 @@ const App = () => (
             <Route path="/laporan" element={<LaporanHafalan />} />
             <Route path="/tasmi" element={<TasmiMarhalah />} />
             <Route path="/rapor" element={<RaporSemester />} />
+            <Route path="/santri" element={<DataSantri />} />
+            <Route path="/halaqoh" element={<DataHalaqoh />} />
+            <Route path="/ustadz" element={<DataUstadz />} />
+            <Route path="/users" element={<DataUsers />} />
+            <Route path="/pengumuman" element={<Pengumuman />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
