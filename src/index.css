@@ -20,7 +20,7 @@ All colors MUST be HSL.
     --primary: 160 60% 45%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 160 60% 55%;
-    --lime: 85 85% 60%;
+    --lime: 75 90% 50%;
     
     /* Secondary - Gold accent */
     --secondary: 45 90% 55%;
@@ -64,7 +64,7 @@ All colors MUST be HSL.
     --primary: 160 55% 50%;
     --primary-foreground: 160 30% 8%;
     --primary-glow: 160 55% 60%;
-    --lime: 85 80% 65%;
+    --lime: 75 85% 55%;
     
     /* Secondary - Gold */
     --secondary: 45 85% 60%;
