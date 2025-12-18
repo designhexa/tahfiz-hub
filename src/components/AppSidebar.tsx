@@ -68,21 +68,11 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border bg-card">
       <SidebarContent>
         {/* Header */}
-        <<div className="relative overflow-hidden p-4 bg-gradient-to-r from-primary to-lime">
-          {/* sembur kuning */}
-          <div
-            className="
-              pointer-events-none
-              absolute inset-0
-              bg-[radial-gradient(circle_at_right,hsl(75_90%_50%/0.45),transparent_60%)]
-            "
-          />
-
-          <div className="relative flex items-center gap-3">
+        <div className="p-4 bg-gradient-to-r from-primary to-lime">
+          <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
-
             {open && (
               <div>
                 <h2 className="font-bold text-lg text-white">Sistem Tahfidz</h2>
