@@ -478,7 +478,7 @@ const TasmiMarhalah = () => {
                         </Badge>
                       ) : (
                         <Badge className="bg-lime-500 text-black hover:bg-yellow-600">
-                          ⟳ Ulang
+                          ⟳ Ulangi
                         </Badge>
                       )}
                       <Button 
