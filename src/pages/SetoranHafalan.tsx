@@ -366,7 +366,7 @@ const SetoranHafalan = () => {
             <CardTitle>Daftar Setoran</CardTitle>
             <CardDescription>Riwayat setoran hafalan santri</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="overflow-hidden">
             {/* Filters */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <Select value={filterJuz} onValueChange={setFilterJuz}>
@@ -406,66 +406,70 @@ const SetoranHafalan = () => {
             </div>
 
             {/* Table */}
-            <div className="rounded-md border overflow-x-auto">
-              <Table className="min-w-[900px]">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tanggal</TableHead>
-                    <TableHead>Santri</TableHead>
-                    <TableHead>Ustadz</TableHead>
-                    <TableHead>Juz</TableHead>
-                    <TableHead>Ayat</TableHead>
-                    <TableHead>Nilai</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Catatan</TableHead>
-                    <TableHead>Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockSetoran.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.tanggal}</TableCell>
-                      <TableCell className="font-medium">{item.santri}</TableCell>
-                      <TableCell>{item.ustadz}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary">
-                          Juz {item.juz}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{item.ayatDari}-{item.ayatSampai}</TableCell>
-                      <TableCell className="font-semibold text-primary">{item.nilai}</TableCell>
-                      <TableCell>
-                        <Badge
-                          className={
-                            item.status === "Lancar"
-                              ? "bg-green-500 hover:bg-green-600"
-                              : "bg-yellow-500 hover:bg-yellow-600"
-                          }
-                        >
-                          {item.status}
-                        </Badge>
-                      </TableCell>
+            <div className="relative -mx-4 sm:-mx-6 overflow-x-auto">
+              <div className="px-4 sm:px-6">
+                <div className="rounded-md border">
+                  <Table className="min-w-[900px]">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tanggal</TableHead>
+                        <TableHead>Santri</TableHead>
+                        <TableHead>Ustadz</TableHead>
+                        <TableHead>Juz</TableHead>
+                        <TableHead>Ayat</TableHead>
+                        <TableHead>Nilai</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Catatan</TableHead>
+                        <TableHead>Aksi</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {mockSetoran.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell>{item.tanggal}</TableCell>
+                          <TableCell className="font-medium">{item.santri}</TableCell>
+                          <TableCell>{item.ustadz}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-primary/10 text-primary border-primary">
+                              Juz {item.juz}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{item.ayatDari}-{item.ayatSampai}</TableCell>
+                          <TableCell className="font-semibold text-primary">{item.nilai}</TableCell>
+                          <TableCell>
+                            <Badge
+                              className={
+                                item.status === "Lancar"
+                                  ? "bg-green-500 hover:bg-green-600"
+                                  : "bg-yellow-500 hover:bg-yellow-600"
+                              }
+                            >
+                              {item.status}
+                            </Badge>
+                          </TableCell>
 
-                      <TableCell className="text-muted-foreground">{item.catatan}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 text-destructive"
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                          <TableCell className="text-muted-foreground">{item.catatan}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8 text-destructive"
+                                onClick={() => handleDelete(item.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
