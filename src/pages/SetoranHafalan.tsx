@@ -24,7 +24,7 @@ const mockSetoran = [
   { id: 2, tanggal: "13/12/2025", santri: "Fatimah Zahra", ustadz: "Ustadz Budi Santoso", juz: 4, ayatDari: 1, ayatSampai: 70, nilai: 96, status: "Lancar", catatan: "Allahu Akbar" },
   { id: 3, tanggal: "12/12/2025", santri: "Muhammad Faiz", ustadz: "Ustadz Ahmad Fauzi", juz: 3, ayatDari: 51, ayatSampai: 100, nilai: 92, status: "Lancar", catatan: "Masya Allah" },
   { id: 4, tanggal: "11/12/2025", santri: "Aisyah Nur", ustadz: "Ustadz Muhammad Yusuf", juz: 3, ayatDari: 1, ayatSampai: 70, nilai: 95, status: "Lancar", catatan: "Allahu Akbar" },
-  { id: 5, tanggal: "09/12/2025", santri: "Fatimah Zahra", ustadz: "Ustadz Budi Santoso", juz: 3, ayatDari: 61, ayatSampai: 130, nilai: 94, status: "Lancar", catatan: "Barakallah" },
+  { id: 5, tanggal: "09/12/2025", santri: "Fatimah Zahra", ustadz: "Ustadz Budi Santoso", juz: 3, ayatDari: 61, ayatSampai: 130, nilai: 78, status: "Kurang", catatan: "Barakallah" },
   { id: 6, tanggal: "07/12/2025", santri: "Muhammad Faiz", ustadz: "Ustadz Ahmad Fauzi", juz: 3, ayatDari: 1, ayatSampai: 50, nilai: 85, status: "Lancar", catatan: "Baik sekali" },
 ];
 
