@@ -40,25 +40,25 @@ export default function Dashboard() {
       title: "Total Santri",
       value: stats.totalSantri,
       icon: Users,
-      gradient: "from-primary to-lime",
+      gradient: "from-green-500 to-lime",
     },
     {
       title: "Total Halaqoh",
       value: stats.totalHalaqoh,
       icon: BookMarked,
-      gradient: "from-secondary to-secondary/80",
+      gradient: "from-green-500 to-emerald-500",
     },
     {
       title: "Total Setoran",
       value: stats.totalSetoran,
       icon: BookOpen,
-      gradient: "from-chart-3 to-chart-3/80",
+      gradient: "from-teal-400 to-teal-600",
     },
     {
       title: "Rata-rata Kelancaran",
       value: `${stats.avgKelancaran}%`,
       icon: TrendingUp,
-      gradient: "from-chart-4 to-chart-4/80",
+      gradient: "from-teal-500 to-cyan-500",
     },
   ];
 
