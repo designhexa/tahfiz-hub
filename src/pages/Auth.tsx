@@ -107,10 +107,10 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-500 to-lime-500 via-background to-secondary/10 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md shadow-emerald">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-primary to-lime flex items-center justify-center shadow-glow">
+          <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-lime-500 flex items-center justify-center shadow-glow">
             <BookOpen className="w-8 h-8 text-primary-foreground" />
           </div>
           <div>
