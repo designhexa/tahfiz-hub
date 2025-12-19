@@ -220,18 +220,23 @@ const AbsensiSetoran = () => {
                           {statusOptions.map((option) => (
                             <Button
                               key={option.value}
-                              variant="default"
+                              variant="outline"
                               size="sm"
                               className={
                                 absensiData[santri.id] === option.value
-                                  ? `!${option.color} text-white hover:opacity-90`
-                                  : ""
+                                  ? `!${option.color} !text-white border-transparent hover:opacity-90`
+                                  : "text-muted-foreground"
                               }
                               onClick={() => handleStatusChange(santri.id, option.value)}
                             >
-                              <option.icon className="w-3 h-3 mr-1 text-white" />
+                              <option.icon
+                                className={`w-3 h-3 mr-1 ${
+                                  absensiData[santri.id] === option.value ? "text-white" : ""
+                                }`}
+                              />
                               {option.label}
                             </Button>
+
                           ))}
                         </div>
                       </TableCell>
