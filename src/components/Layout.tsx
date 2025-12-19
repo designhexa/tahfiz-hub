@@ -13,9 +13,12 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      {/* ⛔ kunci horizontal di level halaman */}
+      <div className="min-h-screen flex w-full bg-background overflow-x-hidden">
         <AppSidebar />
-        <div className="flex-1 flex flex-col">
+
+        {/* ⛔ kunci juga di kolom konten */}
+        <div className="flex-1 flex flex-col overflow-x-hidden">
           {/* Header */}
           <header className="h-16 border-b border-border bg-card px-4 flex items-center justify-between sticky top-0 z-10">
             <SidebarTrigger />
@@ -33,7 +36,7 @@ export function Layout({ children }: LayoutProps) {
           </header>
 
           {/* Main Content */}
-          <main className="flex-1 p-6">
+          <main className="flex-1 p-6 overflow-x-hidden">
             {children}
           </main>
         </div>
