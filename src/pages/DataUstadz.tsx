@@ -48,7 +48,7 @@ export default function DataUstadz() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {mockUstadz.map((ustadz) => (
             <Card key={ustadz.id} className="overflow-hidden">
-              <div className="bg-gradient-to-r from-primary to-lime p-4">
+              <div className="bg-gradient-to-r from-green-500 to-lime-500 p-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-white">{ustadz.nama}</h3>
