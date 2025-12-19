@@ -157,7 +157,7 @@ const TasmiMarhalah = () => {
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90">
+              <Button className="bg-gradient-to-r from-green-500 to-lime-500">
                 <Plus className="w-4 h-4 mr-2" />
                 Tambah Tasmi'
               </Button>
