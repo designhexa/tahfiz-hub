@@ -90,6 +90,13 @@ const surahList = [
   // Add more surahs as needed
 ];
 
+const BATAS_LULUS = 88;
+const BATAS_KESALAHAN = 12;
+
+function tentukanStatus(kelancaran: number, kesalahan: number) {
+  return kelancaran >= BATAS_LULUS && kesalahan <= BATAS_KESALAHAN;
+}
+
 const TasmiMarhalah = () => {
   const [filterSantri, setFilterSantri] = useState("all");
   const [filterHalaqoh, setFilterHalaqoh] = useState("all");
@@ -132,9 +139,28 @@ const TasmiMarhalah = () => {
   );
 
   const handleSubmit = () => {
-    toast.success("Tasmi' marhalah berhasil ditambahkan!");
-    setIsDialogOpen(false);
+  const kelancaran = nilaiKelancaran;
+  const kesalahan = Number(jumlahKesalahan);
+
+  const lulus = tentukanStatus(kelancaran, kesalahan);
+
+  // contoh data baru
+  const newTasmi = {
+    santri: selectedSantri,
+    manzil,
+    kelancaran,
+    kesalahan,
+    lulus, // ✅ otomatis
   };
+
+  toast.success(
+    lulus
+      ? "Tasmi' lulus dan naik manzil"
+      : "Tasmi' perlu diulang"
+  );
+
+  setIsDialogOpen(false);
+};
 
   const handleDelete = (id: number) => {
     toast.success("Tasmi' berhasil dihapus!");
