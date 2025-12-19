@@ -61,7 +61,7 @@ const LaporanHafalan = () => {
               <Download className="w-4 h-4 mr-2" />
               Excel
             </Button>
-            <Button className="bg-primary hover:bg-primary/90" onClick={handleExportPDF}>
+            <Button className="bg-gradient-to-r from-green-500 to-lime-500" onClick={handleExportPDF}>
               <FileText className="w-4 h-4 mr-2" />
               Export PDF
             </Button>

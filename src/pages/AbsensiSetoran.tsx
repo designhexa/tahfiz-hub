@@ -83,7 +83,7 @@ const AbsensiSetoran = () => {
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
-            <Button className="bg-primary hover:bg-primary/90" onClick={handleSaveAbsensi}>
+            <Button className="bg-gradient-to-r from-green-500 to-lime-500" onClick={handleSaveAbsensi}>
               <CheckCircle className="w-4 h-4 mr-2" />
               Simpan Absensi
             </Button>

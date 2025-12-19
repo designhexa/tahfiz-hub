@@ -50,7 +50,7 @@ const RaporSemester = () => {
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-lime mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-lime-500 mb-4">
             <FileText className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Rapor Semester</h1>
@@ -83,7 +83,7 @@ const RaporSemester = () => {
             {features.map((feature, index) => (
               <Card key={index} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-lime flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-green-500 to-lime-500 flex items-center justify-center mb-2">
                     <feature.icon className="w-5 h-5 text-white" />
                   </div>
                   <CardTitle className="text-base">{feature.title}</CardTitle>
