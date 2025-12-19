@@ -92,12 +92,11 @@ const AbsensiSetoran = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {/* Total */}
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <Users className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{stats.total}</p>
@@ -106,69 +105,53 @@ const AbsensiSetoran = () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* Hadir */}
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-white bg-green-500 px-2 rounded">
-                    {stats.hadir}
-                  </p>
+                  <p className="text-2xl font-bold text-green-500">{stats.hadir}</p>
                   <p className="text-xs text-muted-foreground">Hadir</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Izin */}
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-white bg-blue-500 px-2 rounded">
-                    {stats.izin}
-                  </p>
+                  <p className="text-2xl font-bold text-blue-500">{stats.izin}</p>
                   <p className="text-xs text-muted-foreground">Izin</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Sakit */}
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-yellow-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-white bg-red-500 px-2 rounded">
-                    {stats.sakit}
-                  </p>
+                  <p className="text-2xl font-bold text-yellow-500">{stats.sakit}</p>
                   <p className="text-xs text-muted-foreground">Sakit</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          {/* Alfa */}
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-black flex items-center justify-center">
-                  <XCircle className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                  <XCircle className="w-5 h-5 text-red-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-white bg-black px-2 rounded">
-                    {stats.alfa}
-                  </p>
+                  <p className="text-2xl font-bold text-red-500">{stats.alfa}</p>
                   <p className="text-xs text-muted-foreground">Alfa</p>
                 </div>
               </div>
@@ -237,16 +220,16 @@ const AbsensiSetoran = () => {
                           {statusOptions.map((option) => (
                             <Button
                               key={option.value}
-                              variant={absensiData[santri.id] === option.value ? "default" : "outline"}
+                              variant="default"
                               size="sm"
                               className={
-                                absensiData[santri.id] === option.value 
-                                  ? `${option.color} text-white hover:opacity-90` 
+                                absensiData[santri.id] === option.value
+                                  ? `!${option.color} text-white hover:opacity-90`
                                   : ""
                               }
                               onClick={() => handleStatusChange(santri.id, option.value)}
                             >
-                              <option.icon className="w-3 h-3 mr-1" />
+                              <option.icon className="w-3 h-3 mr-1 text-white" />
                               {option.label}
                             </Button>
                           ))}
