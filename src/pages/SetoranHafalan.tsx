@@ -34,6 +34,12 @@ const mockSantri = [
   { id: "3", nama: "Aisyah Nur", nis: "S002", halaqoh: "Halaqoh Al-Azhary" },
 ];
 
+const BATAS_LANCAR_SETORAN = 80;
+
+function tentukanStatusSetoran(nilai: number): "Lancar" | "Kurang" {
+  return nilai >= BATAS_LANCAR_SETORAN ? "Lancar" : "Kurang";
+}
+
 const SetoranHafalan = () => {
   const [filterJuz, setFilterJuz] = useState("all");
   const [filterSantri, setFilterSantri] = useState("all");
@@ -72,18 +78,47 @@ const SetoranHafalan = () => {
   };
 
   const handleSubmit = () => {
-    toast.success("Setoran hafalan berhasil ditambahkan!");
-    setIsDialogOpen(false);
-    // Reset form
-    setSelectedSantri("");
-    setTanggalSetoran(undefined);
-    setJuz("");
-    setSurah("");
-    setAyatDari("1");
-    setAyatSampai("7");
-    setJumlahKesalahan("0");
-    setCatatanTajwid("");
+  if (!tanggalSetoran || !selectedSantriData) return;
+
+  // 🔹 hitung nilai & status setoran
+  const nilai = nilaiKelancaran;
+  const status = tentukanStatusSetoran(nilai);
+
+  // 🔹 data setoran baru (simulasi)
+  const dataBaru = {
+    id: Date.now(),
+    tanggal: format(tanggalSetoran, "dd/MM/yyyy"),
+    santri: selectedSantriData.nama,
+    ustadz: "Ustadz Penguji",
+    juz: Number(juz),
+    ayatDari: Number(ayatDari),
+    ayatSampai: Number(ayatSampai),
+    nilai,
+    status, // ✅ Lancar / Kurang
+    catatan: catatanTajwid,
   };
+
+  console.log("SETORAN BARU:", dataBaru); // opsional debug
+
+  // 🔹 feedback ke user
+  toast.success(
+    status === "Lancar"
+      ? "Setoran lancar, bisa ditingkatkan lagi 💪"
+      : "Setoran dicatat, perlu perbaikan ✍️"
+  );
+
+  setIsDialogOpen(false);
+
+  // 🔹 reset form
+  setSelectedSantri("");
+  setTanggalSetoran(undefined);
+  setJuz("");
+  setSurah("");
+  setAyatDari("1");
+  setAyatSampai("7");
+  setJumlahKesalahan("0");
+  setCatatanTajwid("");
+};
 
   const handleDelete = (id: number) => {
     toast.success("Setoran berhasil dihapus!");
@@ -391,16 +426,17 @@ const SetoranHafalan = () => {
                       <TableCell>{item.ayatDari}-{item.ayatSampai}</TableCell>
                       <TableCell className="font-semibold text-primary">{item.nilai}</TableCell>
                       <TableCell>
-                        <Badge className={
-                          item.status === "Lancar" 
-                            ? "bg-green-500 hover:bg-green-600" 
-                            : item.status === "Ulangi" 
-                            ? "bg-yellow-500 hover:bg-yellow-600" 
-                            : "bg-red-500 hover:bg-red-600"
-                        }>
+                        <Badge
+                          className={
+                            item.status === "Lancar"
+                              ? "bg-green-500 hover:bg-green-600"
+                              : "bg-yellow-500 hover:bg-yellow-600"
+                          }
+                        >
                           {item.status}
                         </Badge>
                       </TableCell>
+
                       <TableCell className="text-muted-foreground">{item.catatan}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
