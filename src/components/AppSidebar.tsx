@@ -75,8 +75,8 @@ export function AppSidebar() {
             </div>
             {open && (
               <div>
-                <h2 className="font-bold text-lg text-white">Sistem Tahfidz</h2>
-                <p className="text-xs text-white/80">Manajemen Hafalan</p>
+                <h2 className="font-bold text-lg text-white">Mantaf IMIS</h2>
+                <p className="text-xs text-white/80">Manajemen Tahfidz</p>
               </div>
             )}
           </div>
