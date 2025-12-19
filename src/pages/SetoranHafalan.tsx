@@ -72,53 +72,54 @@ const SetoranHafalan = () => {
 
   // Nilai Kelancaran
   const nilaiKelancaran = Math.max(0, 100 - parseInt(jumlahKesalahan || "0"));
+  const selisihNilai = Math.max(0, BATAS_LANCAR_SETORAN - nilaiKelancaran);
 
   const handleExport = () => {
     toast.success("Data setoran berhasil diexport!");
   };
 
   const handleSubmit = () => {
-  if (!tanggalSetoran || !selectedSantriData) return;
+    if (!tanggalSetoran || !selectedSantriData) return;
 
-  // 🔹 hitung nilai & status setoran
-  const nilai = nilaiKelancaran;
-  const status = tentukanStatusSetoran(nilai);
+    // 🔹 hitung nilai & status
+    const nilai = nilaiKelancaran;
+    const status = tentukanStatusSetoran(nilai);
 
-  // 🔹 data setoran baru (simulasi)
-  const dataBaru = {
-    id: Date.now(),
-    tanggal: format(tanggalSetoran, "dd/MM/yyyy"),
-    santri: selectedSantriData.nama,
-    ustadz: "Ustadz Penguji",
-    juz: Number(juz),
-    ayatDari: Number(ayatDari),
-    ayatSampai: Number(ayatSampai),
-    nilai,
-    status, // ✅ Lancar / Kurang
-    catatan: catatanTajwid,
+    // 🔹 DATA BARU
+    const dataBaru = {
+      id: Date.now(),
+      tanggal: format(tanggalSetoran, "dd/MM/yyyy"),
+      santri: selectedSantriData.nama,
+      ustadz: "Ustadz Penguji",
+      juz: Number(juz),
+      ayatDari: Number(ayatDari),
+      ayatSampai: Number(ayatSampai),
+      nilai,
+      status,
+      selisih: status === "Kurang" ? selisihNilai : 0,
+      catatan: catatanTajwid,
+    };
+
+    console.log("SETORAN BARU:", dataBaru);
+
+    toast.success(
+      status === "Lancar"
+        ? "Setoran lancar, bisa ditingkatkan lagi 💪"
+        : `Setoran dicatat, kurang ${selisihNilai} poin ✍️`
+    );
+
+    setIsDialogOpen(false);
+
+    // 🔹 reset form
+    setSelectedSantri("");
+    setTanggalSetoran(undefined);
+    setJuz("");
+    setSurah("");
+    setAyatDari("1");
+    setAyatSampai("7");
+    setJumlahKesalahan("0");
+    setCatatanTajwid("");
   };
-
-  console.log("SETORAN BARU:", dataBaru); // opsional debug
-
-  // 🔹 feedback ke user
-  toast.success(
-    status === "Lancar"
-      ? "Setoran lancar, bisa ditingkatkan lagi 💪"
-      : "Setoran dicatat, perlu perbaikan ✍️"
-  );
-
-  setIsDialogOpen(false);
-
-  // 🔹 reset form
-  setSelectedSantri("");
-  setTanggalSetoran(undefined);
-  setJuz("");
-  setSurah("");
-  setAyatDari("1");
-  setAyatSampai("7");
-  setJumlahKesalahan("0");
-  setCatatanTajwid("");
-};
 
   const handleDelete = (id: number) => {
     toast.success("Setoran berhasil dihapus!");
@@ -328,7 +329,15 @@ const SetoranHafalan = () => {
 
                       <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
                         <Label>Nilai Kelancaran</Label>
-                        <span className="text-2xl font-bold text-primary">{nilaiKelancaran}</span>
+                        <div className="text-right">
+                          <span className="text-2xl font-bold text-primary">{nilaiKelancaran}</span>
+
+                          {nilaiKelancaran < BATAS_LANCAR_SETORAN && (
+                            <p className="text-xs text-yellow-600">
+                              Kurang {selisihNilai} poin dari batas lancar
+                            </p>
+                          )}
+                        </div>
                       </div>
 
                       <div className="space-y-2">
