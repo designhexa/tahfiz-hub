@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Plus, CheckCircle, Trash2, User, Calendar, BookOpen } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Plus, CheckCircle, Trash2, User, Calendar, BookOpen, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { JuzSelector } from "@/components/JuzSelector";
 import { getSurahsByJuz, Surah } from "@/lib/quran-data";
-import { useMemo } from "react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 // Mock data
 const mockTasmiStats = {
@@ -95,6 +98,7 @@ const TasmiMarhalah = () => {
 
   // Form state
   const [selectedSantri, setSelectedSantri] = useState("");
+  const [tanggalTasmi, setTanggalTasmi] = useState<Date>();
   const [manzil, setManzil] = useState("");
   const [modePilihan, setModePilihan] = useState("surah");
   const [juz, setJuz] = useState("");
@@ -165,20 +169,48 @@ const TasmiMarhalah = () => {
               </DialogHeader>
               
               <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>Pilih Santri *</Label>
-                  <Select value={selectedSantri} onValueChange={setSelectedSantri}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih santri" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockSantri.map(santri => (
-                        <SelectItem key={santri.id} value={santri.id}>
-                          {santri.nama}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Pilih Santri *</Label>
+                    <Select value={selectedSantri} onValueChange={setSelectedSantri}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih santri" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {mockSantri.map(santri => (
+                          <SelectItem key={santri.id} value={santri.id}>
+                            {santri.nama}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tanggal Tasmi' *</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !tanggalTasmi && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {tanggalTasmi ? format(tanggalTasmi, "dd/MM/yyyy") : "Pilih tanggal"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={tanggalTasmi}
+                          onSelect={setTanggalTasmi}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
 
                 <div className="space-y-2">

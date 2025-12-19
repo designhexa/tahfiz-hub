@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,12 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Download, Edit, Trash2, BookOpen } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Plus, Download, Edit, Trash2, BookOpen, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { JuzSelector } from "@/components/JuzSelector";
+import { getSurahsByJuz, Surah } from "@/lib/quran-data";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 // Mock data for setoran
 const mockSetoran = [
@@ -38,18 +42,30 @@ const SetoranHafalan = () => {
   
   // Form state
   const [selectedSantri, setSelectedSantri] = useState("");
-  const [tanggalSetoran, setTanggalSetoran] = useState("");
-  const [modePilihan, setModePilihan] = useState("halaman");
+  const [tanggalSetoran, setTanggalSetoran] = useState<Date>();
+  const [modePilihan, setModePilihan] = useState("surah");
   const [juz, setJuz] = useState("");
-  const [halamanDari, setHalamanDari] = useState("1");
-  const [halamanSampai, setHalamanSampai] = useState("5");
-  const [nilaiKelancaran, setNilaiKelancaran] = useState([0]);
-  const [statusHafalan, setStatusHafalan] = useState("Lancar");
-  const [catatan, setCatatan] = useState("");
+  const [surah, setSurah] = useState("");
+  const [ayatDari, setAyatDari] = useState("1");
+  const [ayatSampai, setAyatSampai] = useState("7");
+  const [jumlahKesalahan, setJumlahKesalahan] = useState("0");
+  const [catatanTajwid, setCatatanTajwid] = useState("");
 
   const selectedSantriData = mockSantri.find(s => s.id === selectedSantri);
-  const totalHalaman = parseInt(halamanSampai || "0") - parseInt(halamanDari || "0") + 1;
-  const estimasiAyat = totalHalaman * 10; // Rough estimate
+  
+  // Surah by Juz
+  const surahByJuz: Surah[] = useMemo(() => {
+    if (!juz) return [];
+    return getSurahsByJuz(Number(juz));
+  }, [juz]);
+
+  // Selected Surah
+  const selectedSurah = useMemo(() => {
+    return surahByJuz.find(s => s.number === Number(surah));
+  }, [surah, surahByJuz]);
+
+  // Nilai Kelancaran
+  const nilaiKelancaran = Math.max(0, 100 - parseInt(jumlahKesalahan || "0"));
 
   const handleExport = () => {
     toast.success("Data setoran berhasil diexport!");
@@ -60,13 +76,13 @@ const SetoranHafalan = () => {
     setIsDialogOpen(false);
     // Reset form
     setSelectedSantri("");
-    setTanggalSetoran("");
+    setTanggalSetoran(undefined);
     setJuz("");
-    setHalamanDari("1");
-    setHalamanSampai("5");
-    setNilaiKelancaran([0]);
-    setStatusHafalan("Lancar");
-    setCatatan("");
+    setSurah("");
+    setAyatDari("1");
+    setAyatSampai("7");
+    setJumlahKesalahan("0");
+    setCatatanTajwid("");
   };
 
   const handleDelete = (id: number) => {
@@ -128,12 +144,30 @@ const SetoranHafalan = () => {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label>Tanggal Setoran</Label>
-                          <Input 
-                            type="date" 
-                            value={tanggalSetoran}
-                            onChange={(e) => setTanggalSetoran(e.target.value)}
-                          />
+                          <Label>Tanggal Setoran *</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full justify-start text-left font-normal",
+                                  !tanggalSetoran && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {tanggalSetoran ? format(tanggalSetoran, "dd/MM/yyyy") : "Pilih tanggal"}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={tanggalSetoran}
+                                onSelect={setTanggalSetoran}
+                                initialFocus
+                                className="p-3 pointer-events-auto"
+                              />
+                            </PopoverContent>
+                          </Popover>
                         </div>
                       </div>
                       {selectedSantriData && (
@@ -156,111 +190,122 @@ const SetoranHafalan = () => {
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
                         <Label>Mode Pilihan *</Label>
-                          <Select value={modePilihan} onValueChange={setModePilihan}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="surah">📖 Pilih per Surah & Ayat</SelectItem>
-                              <SelectItem value="halaman">📄 Pilih per Halaman</SelectItem>
-                            </SelectContent>
-                          </Select>
-                      </div>
-                      
-                      <JuzSelector value={juz} onValueChange={setJuz} required />
-
-                      <div className="space-y-2">
-                        <Label>Pilih Halaman *</Label>
-                        <p className="text-xs text-muted-foreground">Al-Qur'an memiliki 604 halaman (Mushaf Utsmani)</p>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <Label className="text-xs">Halaman Dari</Label>
-                            <Input 
-                              type="number" 
-                              value={halamanDari}
-                              onChange={(e) => setHalamanDari(e.target.value)}
-                              min="1" 
-                              max="604"
-                            />
-                          </div>
-                          <div className="space-y-1">
-                            <Label className="text-xs">Halaman Sampai</Label>
-                            <Input 
-                              type="number" 
-                              value={halamanSampai}
-                              onChange={(e) => setHalamanSampai(e.target.value)}
-                              min="1" 
-                              max="604"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="p-3 bg-muted rounded-lg">
-                        <p className="text-sm">Total Halaman: <span className="font-medium">{totalHalaman} halaman</span></p>
-                      </div>
-                      <div className="p-3 bg-muted rounded-lg flex items-center justify-between">
-                        <p className="text-sm">Total Ayat (Estimasi):</p>
-                        <Badge className="bg-primary">{estimasiAyat} Ayat</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Penilaian Kelancaran */}
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                        <span>⭐</span> Penilaian Kelancaran
-                      </CardTitle>
-                      <CardDescription>Berikan penilaian berdasarkan kelancaran hafalan</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Label>Nilai Kelancaran (0-100)</Label>
-                          <Badge variant="outline" className="bg-primary/10 text-primary border-primary">
-                            {nilaiKelancaran[0]}
-                          </Badge>
-                        </div>
-                        <Slider
-                          value={nilaiKelancaran}
-                          onValueChange={setNilaiKelancaran}
-                          max={100}
-                          step={1}
-                          className="py-4"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>Kurang</span>
-                          <span>Cukup</span>
-                          <span>Baik</span>
-                          <span>Sangat Baik</span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Status Hafalan</Label>
-                        <Select value={statusHafalan} onValueChange={setStatusHafalan}>
+                        <Select value={modePilihan} onValueChange={setModePilihan}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Lancar">✅ Lancar</SelectItem>
-                            <SelectItem value="Ulangi">🔄 Ulangi</SelectItem>
-                            <SelectItem value="Salah">❌ Salah</SelectItem>
+                            <SelectItem value="surah">📖 Pilih per Surah & Ayat</SelectItem>
+                            <SelectItem value="halaman">📄 Pilih per Halaman</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
+                      
+                      <JuzSelector value={juz} onValueChange={setJuz} required />
 
-                      <div className="space-y-2">
-                        <Label>Catatan (Opsional)</Label>
-                        <Textarea 
-                          placeholder="Masukkan catatan tambahan..."
-                          value={catatan}
-                          onChange={(e) => setCatatan(e.target.value)}
-                        />
-                      </div>
+                      {/* Surah Selection Card */}
+                      <Card className="border-dashed border-yellow-400 bg-yellow-50/50 dark:bg-yellow-950/20">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Surah #1</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>Nama Surah *</Label>
+                            <Select
+                              value={surah}
+                              onValueChange={setSurah}
+                              disabled={!juz}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder={juz ? "Pilih surah" : "Pilih juz dulu"} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {surahByJuz.map((s) => (
+                                  <SelectItem key={s.number} value={String(s.number)}>
+                                    {s.number}. {s.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">
+                              Menampilkan surah dalam Juz {juz || "-"}
+                            </p>
+                          </div>
+
+                          {selectedSurah && (
+                            <div className="p-2 bg-primary/10 rounded border border-primary/20">
+                              <p className="text-sm">
+                                {selectedSurah.name} ({selectedSurah.arabicName}) – Jumlah ayat:{" "}
+                                {selectedSurah.numberOfAyahs}
+                              </p>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <Label className="text-xs">Ayat Dari *</Label>
+                              <Input
+                                type="number"
+                                min={1}
+                                max={selectedSurah?.numberOfAyahs}
+                                value={ayatDari}
+                                onChange={(e) => setAyatDari(e.target.value)}
+                                disabled={!selectedSurah}
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs">Ayat Sampai *</Label>
+                              <Input
+                                type="number"
+                                min={Number(ayatDari)}
+                                max={selectedSurah?.numberOfAyahs}
+                                value={ayatSampai}
+                                onChange={(e) => setAyatSampai(e.target.value)}
+                                disabled={!selectedSurah}
+                              />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Button variant="outline" className="w-full border-dashed">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Tambah Surah Lain
+                      </Button>
                     </CardContent>
                   </Card>
+
+                  {/* Penilaian Section */}
+                  <div className="pt-4 border-t">
+                    <h4 className="font-semibold mb-4">Penilaian</h4>
+                    
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Jumlah Kesalahan *</Label>
+                        <Input 
+                          type="number" 
+                          value={jumlahKesalahan}
+                          onChange={(e) => setJumlahKesalahan(e.target.value)}
+                          min="0"
+                        />
+                        <p className="text-xs text-muted-foreground">Setiap kesalahan mengurangi 1 poin dari nilai 100</p>
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <Label>Nilai Kelancaran</Label>
+                        <span className="text-2xl font-bold text-primary">{nilaiKelancaran}</span>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Catatan Tajwid *</Label>
+                        <Textarea 
+                          placeholder="Contoh: Bacaan ikhfa perlu diperbaiki, mad wajib sudah baik..."
+                          value={catatanTajwid}
+                          onChange={(e) => setCatatanTajwid(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
 
                   <Button onClick={handleSubmit} className="w-full bg-primary hover:bg-primary/90">
                     Simpan Setoran
