@@ -46,19 +46,19 @@ export default function Dashboard() {
       title: "Total Halaqoh",
       value: stats.totalHalaqoh,
       icon: BookMarked,
-      gradient: "from-green-500 to-emerald-500",
+      gradient: "from-green-500 to-lime-500",
     },
     {
       title: "Total Setoran",
       value: stats.totalSetoran,
       icon: BookOpen,
-      gradient: "from-teal-400 to-teal-600",
+      gradient: "from-green-500 to-lime-500",
     },
     {
       title: "Rata-rata Kelancaran",
       value: `${stats.avgKelancaran}%`,
       icon: TrendingUp,
-      gradient: "from-lime-500 to-cyan-500",
+      gradient: "from-green-500 to-lime-500",
     },
   ];
 
