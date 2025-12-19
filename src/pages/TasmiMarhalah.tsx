@@ -471,10 +471,14 @@ const TasmiMarhalah = () => {
                     </div>
                     
                     <div className="flex items-center gap-2">
-                      {item.lulus && (
+                      {item.lulus ? (
                         <Badge className="bg-green-500 hover:bg-green-600">
                           <CheckCircle className="w-4 h-4 mr-1" />
                           Lulus
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-yellow-500 text-black hover:bg-yellow-600">
+                          ⟳ Mengulang
                         </Badge>
                       )}
                       <Button 
