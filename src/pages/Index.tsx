@@ -15,11 +15,11 @@ const Index = () => {
           </div>
           
           <h1 className="text-5xl md:text-6xl font-bold text-foreground animate-fade-in">
-            Aplikasi Manajemen Tahfidz - Mantaf IMIS
+            Aplikasi Mantaf IMIS
           </h1>
           
           <p className="text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            Sistem Manajemen Tahfidz yang Modern dan Terintegrasi
+            Aplikasi Manajemen Tahfidz yang Modern dan Terintegrasi
           </p>
 
           <div className="flex gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.4s" }}>
