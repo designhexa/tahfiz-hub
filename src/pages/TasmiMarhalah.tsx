@@ -55,7 +55,7 @@ const mockTasmiData = [
     tanggal: "3/12/2025",
     ustadz: "Ustadz Ahmad Fauzi",
     kelancaran: 74,
-    kesalahan: 12,
+    kesalahan: 26,
     juz: 3,
     catatan: "Perlu perbaikan di tajwid. Semangat!",
     lulus: false,
