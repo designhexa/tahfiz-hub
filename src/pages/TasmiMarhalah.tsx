@@ -477,7 +477,7 @@ const TasmiMarhalah = () => {
                           Lulus
                         </Badge>
                       ) : (
-                        <Badge className="bg-lime-500 text-black hover:bg-yellow-600">
+                        <Badge className="bg-yellow-500 text-black hover:bg-yellow-600">
                           ⟳ Ulangi
                         </Badge>
                       )}
