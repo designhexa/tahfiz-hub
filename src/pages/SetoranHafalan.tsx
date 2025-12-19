@@ -386,7 +386,7 @@ const SetoranHafalan = () => {
                         value={String(i + 1)}
                         className="justify-center"
                       >
-                        Juz {i + 1}
+                        {i + 1}
                       </SelectItem>
                     ))}
                   </div>
