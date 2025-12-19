@@ -58,7 +58,7 @@ export default function Dashboard() {
       title: "Rata-rata Kelancaran",
       value: `${stats.avgKelancaran}%`,
       icon: TrendingUp,
-      gradient: "from-teal-500 to-cyan-500",
+      gradient: "from-lime-500 to-cyan-500",
     },
   ];
 
