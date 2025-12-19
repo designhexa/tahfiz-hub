@@ -369,11 +369,29 @@ const SetoranHafalan = () => {
           <CardContent className="overflow-hidden">
             {/* Filters */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <JuzSelector
-                value={filterJuz}
-                onValueChange={setFilterJuz}
-                label="Filter Juz"
-              />
+              <Select value={filterJuz} onValueChange={setFilterJuz}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Semua Juz" />
+                </SelectTrigger>
+
+                <SelectContent className="p-2">
+                  {/* item default */}
+                  <SelectItem value="all">Semua Juz</SelectItem>
+
+                  {/* grid juz */}
+                  <div className="grid grid-cols-6 gap-1 mt-2">
+                    {Array.from({ length: 30 }, (_, i) => (
+                      <SelectItem
+                        key={i + 1}
+                        value={String(i + 1)}
+                        className="justify-center"
+                      >
+                        Juz {i + 1}
+                      </SelectItem>
+                    ))}
+                  </div>
+                </SelectContent>
+              </Select>
               
               <Select value={filterSantri} onValueChange={setFilterSantri}>
                 <SelectTrigger>
