@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, FileText, TrendingUp, BookOpen, Calendar, BarChart3 } from "lucide-react";
+import { Download, FileText, TrendingUp, BookOpen, Calendar, BarChart3, Target } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 
@@ -34,6 +34,14 @@ const mockCapaianJuz = [
   { juz: 5, santriSelesai: 15, totalSantri: 50, persentase: 30 },
 ];
 
+const mockDrillHafalan = [
+  { santri: "Muhammad Faiz", halaqoh: "Al-Azhary", kelas: "Paket A Kelas 6", drill1: "Lulus", drill2: "Lulus", drill12Juz: "Proses", drill1Juz: "-", tasmi: "-", nilaiTerakhir: 92 },
+  { santri: "Fatimah Zahra", halaqoh: "Al-Azhary", kelas: "KBTK A", drill1: "Lulus", drill2: "Lulus", drill12Juz: "Lulus", drill1Juz: "Proses", tasmi: "-", nilaiTerakhir: 88 },
+  { santri: "Aisyah Nur", halaqoh: "Al-Furqon", kelas: "Paket B Kelas 8", drill1: "Lulus", drill2: "Proses", drill12Juz: "-", drill1Juz: "-", tasmi: "-", nilaiTerakhir: 90 },
+  { santri: "Ahmad Rasyid", halaqoh: "Al-Furqon", kelas: "Paket A Kelas 6", drill1: "Lulus", drill2: "Lulus", drill12Juz: "Lulus", drill1Juz: "Lulus", tasmi: "Lulus", nilaiTerakhir: 95 },
+  { santri: "Umar Faruq", halaqoh: "Al-Hidayah", kelas: "KBTK B", drill1: "Proses", drill2: "-", drill12Juz: "-", drill1Juz: "-", tasmi: "-", nilaiTerakhir: 85 },
+];
+
 const mockSantri = [
   { id: "1", nama: "Muhammad Faiz", halaqoh: "azhary" },
   { id: "2", nama: "Fatimah Zahra", halaqoh: "azhary" },
@@ -46,10 +54,23 @@ const LaporanHafalan = () => {
   const [filterHalaqoh, setFilterHalaqoh] = useState("all");
   const [filterBulan, setFilterBulan] = useState("januari");
   const [filterSantri, setFilterSantri] = useState("all");
+  const [filterKelas, setFilterKelas] = useState("all");
 
   const filteredSantri = filterHalaqoh === "all" 
     ? mockSantri 
     : mockSantri.filter(s => s.halaqoh === filterHalaqoh);
+
+  const filteredDrill = mockDrillHafalan.filter((d) => {
+    const matchHalaqoh = filterHalaqoh === "all" || d.halaqoh.toLowerCase().includes(filterHalaqoh);
+    const matchKelas = filterKelas === "all" || d.kelas === filterKelas;
+    return matchHalaqoh && matchKelas;
+  });
+
+  const getStatusBadge = (status: string) => {
+    if (status === "Lulus") return <Badge className="bg-green-500 hover:bg-green-600 text-white">Lulus</Badge>;
+    if (status === "Proses") return <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white">Proses</Badge>;
+    return <Badge variant="outline" className="text-muted-foreground">-</Badge>;
+  };
 
   const handleExportPDF = () => {
     toast.success("Laporan berhasil diexport ke PDF!");
@@ -139,7 +160,7 @@ const LaporanHafalan = () => {
         {/* Filters */}
         <Card>
           <CardContent className="pt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Periode</label>
                 <Select value={filterPeriode} onValueChange={setFilterPeriode}>
@@ -176,6 +197,22 @@ const LaporanHafalan = () => {
                     <SelectItem value="all">Semua Halaqoh</SelectItem>
                     <SelectItem value="azhary">Halaqoh Al-Azhary</SelectItem>
                     <SelectItem value="furqon">Halaqoh Al-Furqon</SelectItem>
+                    <SelectItem value="hidayah">Halaqoh Al-Hidayah</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Kelas</label>
+                <Select value={filterKelas} onValueChange={setFilterKelas}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Kelas</SelectItem>
+                    <SelectItem value="KBTK A">KBTK A</SelectItem>
+                    <SelectItem value="KBTK B">KBTK B</SelectItem>
+                    <SelectItem value="Paket A Kelas 6">Paket A Kelas 6</SelectItem>
+                    <SelectItem value="Paket B Kelas 8">Paket B Kelas 8</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -199,7 +236,7 @@ const LaporanHafalan = () => {
 
         {/* Tabs Content */}
         <Tabs defaultValue="harian" className="space-y-4">
-          <TabsList>
+          <TabsList className="flex-wrap">
             <TabsTrigger value="harian" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Rekap Harian
@@ -211,6 +248,10 @@ const LaporanHafalan = () => {
             <TabsTrigger value="capaian" className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4" />
               Capaian per Juz
+            </TabsTrigger>
+            <TabsTrigger value="drill" className="flex items-center gap-2">
+              <Target className="w-4 h-4" />
+              Rekap Drill Hafalan
             </TabsTrigger>
           </TabsList>
 
@@ -323,6 +364,50 @@ const LaporanHafalan = () => {
                       <Progress value={item.persentase} className="h-2" />
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Rekap Drill Hafalan */}
+          <TabsContent value="drill">
+            <Card>
+              <CardHeader>
+                <CardTitle>Rekap Drill Hafalan</CardTitle>
+                <CardDescription>Progress drill hafalan per santri (Drill 1, Drill 2, ½ Juz, 1 Juz, Tasmi')</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Santri</TableHead>
+                        <TableHead>Halaqoh</TableHead>
+                        <TableHead>Kelas</TableHead>
+                        <TableHead className="text-center">Drill 1</TableHead>
+                        <TableHead className="text-center">Drill 2</TableHead>
+                        <TableHead className="text-center">½ Juz</TableHead>
+                        <TableHead className="text-center">1 Juz</TableHead>
+                        <TableHead className="text-center">Tasmi'</TableHead>
+                        <TableHead className="text-center">Nilai Terakhir</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredDrill.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{item.santri}</TableCell>
+                          <TableCell>{item.halaqoh}</TableCell>
+                          <TableCell>{item.kelas}</TableCell>
+                          <TableCell className="text-center">{getStatusBadge(item.drill1)}</TableCell>
+                          <TableCell className="text-center">{getStatusBadge(item.drill2)}</TableCell>
+                          <TableCell className="text-center">{getStatusBadge(item.drill12Juz)}</TableCell>
+                          <TableCell className="text-center">{getStatusBadge(item.drill1Juz)}</TableCell>
+                          <TableCell className="text-center">{getStatusBadge(item.tasmi)}</TableCell>
+                          <TableCell className="text-center font-semibold text-primary">{item.nilaiTerakhir}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
               </CardContent>
             </Card>
