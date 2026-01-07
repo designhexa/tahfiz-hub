@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,17 +36,17 @@ import {
 import { 
   Award, 
   Plus,
-  User,
-  BookOpen,
   AlertCircle,
   CheckCircle2,
   XCircle,
   FileText,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  User
 } from "lucide-react";
 import { getJuzName } from "@/lib/quran-data";
 import { JuzSelector } from "@/components/JuzSelector";
+import { supabase } from "@/integrations/supabase/client";
 
 const JUZ_ORDER = [30, 29, 28, 27, 26, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
 
@@ -58,10 +58,20 @@ const getPredikat = (nilai: number): { label: string; color: string; passed: boo
   return { label: "Tidak Lulus", color: "bg-red-500", passed: false };
 };
 
+interface Halaqoh {
+  id: string;
+  nama_halaqoh: string;
+}
+
+interface Kelas {
+  id: string;
+  nama_kelas: string;
+}
+
 const dummySantri = [
-  { id: "1", nama: "Ahmad Fauzi", halaqoh: "Halaqoh Al-Fatih", juzSelesai: [30, 29] },
-  { id: "2", nama: "Muhammad Rizki", halaqoh: "Halaqoh Al-Fatih", juzSelesai: [30] },
-  { id: "3", nama: "Abdullah Hakim", halaqoh: "Halaqoh An-Nur", juzSelesai: [] },
+  { id: "1", nama: "Ahmad Fauzi", halaqoh: "Halaqoh Al-Fatih", kelas: "Paket A Kelas 6", juzSelesai: [30, 29] },
+  { id: "2", nama: "Muhammad Rizki", halaqoh: "Halaqoh Al-Fatih", kelas: "Paket A Kelas 6", juzSelesai: [30] },
+  { id: "3", nama: "Abdullah Hakim", halaqoh: "Halaqoh An-Nur", kelas: "KBTK A", juzSelesai: [] },
 ];
 
 const dummyHasilUjian = [
