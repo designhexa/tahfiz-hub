@@ -239,21 +239,18 @@ const UjianTasmi = () => {
                     Nilai per halaman: 5 poin. Setiap pancingan mengurangi 1 poin. Maks 5 pancingan/halaman.
                   </p>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2">
                     {penilaianHalaman.map((h, idx) => (
-                      <Card key={idx} className="p-2">
-                        <div className="text-center mb-1">
-                          <span className="text-xs font-medium">Hal {h.halaman}</span>
-                          <span className="text-xs text-muted-foreground ml-1">
-                            ({Math.max(0, 5 - h.pancingan)} poin)
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
+                      <div key={idx} className="flex items-center gap-1.5 p-1.5 border rounded-md bg-card">
+                        <span className="text-xs font-medium whitespace-nowrap">
+                          Hal {h.halaman} <span className="text-muted-foreground">({Math.max(0, 5 - h.pancingan)})</span>
+                        </span>
+                        <div className="flex items-center gap-0.5 ml-auto">
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="h-7 w-7 p-0"
+                            className="h-6 w-6 p-0 text-xs"
                             onClick={() => {
                               const newPenilaian = [...penilaianHalaman];
                               newPenilaian[idx].pancingan = Math.max(0, newPenilaian[idx].pancingan - 1);
@@ -262,23 +259,12 @@ const UjianTasmi = () => {
                           >
                             -
                           </Button>
-                          <Input
-                            type="number"
-                            min="0"
-                            max="5"
-                            value={h.pancingan}
-                            onChange={(e) => {
-                              const newPenilaian = [...penilaianHalaman];
-                              newPenilaian[idx].pancingan = Math.min(5, Math.max(0, parseInt(e.target.value) || 0));
-                              setPenilaianHalaman(newPenilaian);
-                            }}
-                            className="h-7 text-center text-xs"
-                          />
+                          <span className="w-5 text-center text-xs font-medium">{h.pancingan}</span>
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="h-7 w-7 p-0"
+                            className="h-6 w-6 p-0 text-xs"
                             onClick={() => {
                               const newPenilaian = [...penilaianHalaman];
                               newPenilaian[idx].pancingan = Math.min(5, newPenilaian[idx].pancingan + 1);
@@ -288,7 +274,7 @@ const UjianTasmi = () => {
                             +
                           </Button>
                         </div>
-                      </Card>
+                      </div>
                     ))}
                   </div>
                 </div>
