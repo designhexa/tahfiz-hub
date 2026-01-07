@@ -12,6 +12,7 @@ import AbsensiSetoran from "./pages/AbsensiSetoran";
 import LaporanHafalan from "./pages/LaporanHafalan";
 import DrillHafalan from "./pages/DrillHafalan";
 import UjianTasmi from "./pages/UjianTasmi";
+import UjianTahfidz from "./pages/UjianTahfidz";
 import RaporSemester from "./pages/RaporSemester";
 import DataSantri from "./pages/DataSantri";
 import DataHalaqoh from "./pages/DataHalaqoh";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/laporan" element={<LaporanHafalan />} />
             <Route path="/drill" element={<DrillHafalan />} />
             <Route path="/ujian-tasmi" element={<UjianTasmi />} />
+            <Route path="/ujian-tahfidz" element={<UjianTahfidz />} />
             <Route path="/rapor" element={<RaporSemester />} />
             <Route path="/santri" element={<DataSantri />} />
             <Route path="/halaqoh" element={<DataHalaqoh />} />
