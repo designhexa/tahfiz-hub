@@ -11,15 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { 
   Plus, 
   CheckCircle, 
-  Trash2, 
-  User, 
-  Calendar, 
-  BookOpen, 
+  Search,
   CalendarIcon,
   ChevronRight,
   Lock,
@@ -28,19 +25,15 @@ import {
   Eye,
   X,
   Award,
-  AlertCircle
+  AlertCircle,
+  BookOpen,
+  ArrowLeft
 } from "lucide-react";
 import { toast } from "sonner";
 import { JuzSelector } from "@/components/JuzSelector";
 import { getSurahsByJuz, Surah } from "@/lib/quran-data";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 // Types for drill progression
 interface DrillSurahEntry {
@@ -141,13 +134,29 @@ const mockSantriDrillProgress: DrillProgress[] = [
       },
     ],
   },
+  {
+    santriId: "3",
+    juz: 30,
+    drill1Completed: false,
+    drill2Completed: false,
+    drillHalfJuzCompleted: false,
+    drillFirstHalfJuz: false,
+    drillSecondHalfJuz: false,
+    tasmi1JuzUnlocked: false,
+    drillResults: [],
+  },
 ];
 
 const mockSantri = [
   { id: "1", nama: "Muhammad Faiz", nis: "S001", halaqoh: "Halaqoh Al-Azhary" },
   { id: "2", nama: "Fatimah Zahra", nis: "S003", halaqoh: "Halaqoh Al-Furqon" },
   { id: "3", nama: "Aisyah Nur", nis: "S002", halaqoh: "Halaqoh Al-Azhary" },
+  { id: "4", nama: "Ahmad Rizky", nis: "S004", halaqoh: "Halaqoh Al-Azhary" },
+  { id: "5", nama: "Ali Akbar", nis: "S005", halaqoh: "Halaqoh Al-Furqon" },
+  { id: "6", nama: "Umar Faruq", nis: "S006", halaqoh: "Halaqoh Al-Hidayah" },
 ];
+
+const halaqohOptions = ["Semua Halaqoh", "Halaqoh Al-Azhary", "Halaqoh Al-Furqon", "Halaqoh Al-Hidayah"];
 
 const BATAS_LULUS = 88;
 const BATAS_KESALAHAN = 12;
@@ -170,11 +179,16 @@ const getDrillLevelName = (levelId: string) => {
 };
 
 const DrillHafalan = () => {
-  const [selectedSantriFilter, setSelectedSantriFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [filterHalaqoh, setFilterHalaqoh] = useState("Semua Halaqoh");
   const [selectedJuz, setSelectedJuz] = useState("30");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [selectedSantriDetail, setSelectedSantriDetail] = useState<string | null>(null);
+  
+  // View state: "table" or "cards"
+  const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+  const [selectedHalaqohForCards, setSelectedHalaqohForCards] = useState("");
 
   // Form state
   const [selectedSantri, setSelectedSantri] = useState("");
@@ -193,6 +207,86 @@ const DrillHafalan = () => {
   }, [juz]);
 
   const nilaiKelancaran = Math.max(0, 100 - parseInt(jumlahKesalahan || "0"));
+
+  // Get progress for a specific santri
+  const getSantriProgress = (santriId: string) => {
+    return mockSantriDrillProgress.find(p => p.santriId === santriId);
+  };
+
+  // Check if a drill level is unlocked for a santri
+  const isDrillUnlocked = (progress: DrillProgress | undefined, level: string) => {
+    if (!progress) return level === "drill1";
+    
+    switch (level) {
+      case "drill1":
+        return true;
+      case "drill2":
+        return progress.drill1Completed;
+      case "drillHalfJuz":
+        return progress.drill1Completed && progress.drill2Completed;
+      case "drillFirstHalf":
+        return progress.drillHalfJuzCompleted;
+      case "drillSecondHalf":
+        return progress.drillHalfJuzCompleted && progress.drillFirstHalfJuz;
+      case "tasmi1Juz":
+        return progress.drillFirstHalfJuz && progress.drillSecondHalfJuz;
+      default:
+        return false;
+    }
+  };
+
+  // Filter santri based on search and halaqoh
+  const filteredSantri = mockSantri.filter((santri) => {
+    const matchSearch = santri.nama.toLowerCase().includes(search.toLowerCase()) ||
+      santri.nis.toLowerCase().includes(search.toLowerCase());
+    const matchHalaqoh = filterHalaqoh === "Semua Halaqoh" || santri.halaqoh === filterHalaqoh;
+    return matchSearch && matchHalaqoh;
+  });
+
+  // Filter for card view
+  const filteredSantriForCards = mockSantri.filter((santri) => {
+    return santri.halaqoh === selectedHalaqohForCards;
+  });
+
+  // Get last drill info for a santri
+  const getLastDrillInfo = (santriId: string) => {
+    const progress = getSantriProgress(santriId);
+    if (!progress || progress.drillResults.length === 0) {
+      return { lastDrill: null, currentStage: "Drill 1", progressPercent: 0 };
+    }
+    
+    const lastDrill = progress.drillResults[progress.drillResults.length - 1];
+    
+    let currentStage = "Drill 1";
+    let progressPercent = 0;
+    
+    const stages = [
+      progress.drill1Completed,
+      progress.drill2Completed,
+      progress.drillHalfJuzCompleted,
+      progress.drillFirstHalfJuz,
+      progress.drillSecondHalfJuz,
+    ];
+    
+    const completed = stages.filter(Boolean).length;
+    progressPercent = completed * 20;
+    
+    if (progress.drillFirstHalfJuz && progress.drillSecondHalfJuz) {
+      currentStage = "Siap Tasmi'";
+    } else if (progress.drillSecondHalfJuz) {
+      currentStage = "Tasmi' 1 Juz";
+    } else if (progress.drillFirstHalfJuz) {
+      currentStage = "½ Juz Kedua";
+    } else if (progress.drillHalfJuzCompleted) {
+      currentStage = "½ Juz Pertama";
+    } else if (progress.drill2Completed) {
+      currentStage = "Drill ½ Juz";
+    } else if (progress.drill1Completed) {
+      currentStage = "Drill 2";
+    }
+    
+    return { lastDrill, currentStage, progressPercent };
+  };
 
   const handleAddSurahEntry = () => {
     setSurahEntries(prev => [
@@ -251,33 +345,6 @@ const DrillHafalan = () => {
     setCatatanTajwid("");
   };
 
-  // Get progress for a specific santri
-  const getSantriProgress = (santriId: string) => {
-    return mockSantriDrillProgress.find(p => p.santriId === santriId);
-  };
-
-  // Check if a drill level is unlocked for a santri
-  const isDrillUnlocked = (progress: DrillProgress | undefined, level: string) => {
-    if (!progress) return level === "drill1"; // First drill always unlocked
-    
-    switch (level) {
-      case "drill1":
-        return true;
-      case "drill2":
-        return progress.drill1Completed;
-      case "drillHalfJuz":
-        return progress.drill1Completed && progress.drill2Completed;
-      case "drillFirstHalf":
-        return progress.drillHalfJuzCompleted;
-      case "drillSecondHalf":
-        return progress.drillHalfJuzCompleted && progress.drillFirstHalfJuz;
-      case "tasmi1Juz":
-        return progress.drillFirstHalfJuz && progress.drillSecondHalfJuz;
-      default:
-        return false;
-    }
-  };
-
   const openDetailDialog = (santriId: string) => {
     setSelectedSantriDetail(santriId);
     setIsDetailDialogOpen(true);
@@ -293,11 +360,21 @@ const DrillHafalan = () => {
     return getSantriProgress(selectedSantriDetail);
   };
 
+  const handleOpenCards = (halaqoh: string) => {
+    setSelectedHalaqohForCards(halaqoh);
+    setViewMode("cards");
+  };
+
+  const handleBackToTable = () => {
+    setViewMode("table");
+    setSelectedHalaqohForCards("");
+  };
+
   return (
     <Layout>
-      <div className="space-y-4 md:space-y-6">
-        {/* Header - Mobile Optimized */}
-        <div className="flex flex-col gap-3">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">Drill Hafalan</h1>
             <p className="text-sm md:text-base text-muted-foreground">Kelola tahapan drill hafalan santri dengan sistem checkpoint</p>
@@ -557,243 +634,314 @@ const DrillHafalan = () => {
           </Dialog>
         </div>
 
-        {/* Filter - Mobile Optimized */}
-        <Card>
-          <CardContent className="p-3 md:p-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Filter Santri</Label>
-                <Select value={selectedSantriFilter} onValueChange={setSelectedSantriFilter}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="Semua" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Semua Santri</SelectItem>
-                    {mockSantri.map(santri => (
-                      <SelectItem key={santri.id} value={santri.id}>{santri.nama}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+        {viewMode === "table" ? (
+          /* Table View */
+          <div className="bg-card rounded-lg border border-border p-4 md:p-6">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Cari santri..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Juz</Label>
-                <Select value={selectedJuz} onValueChange={setSelectedJuz}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue placeholder="Pilih Juz" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from({ length: 30 }, (_, i) => (
-                      <SelectItem key={i + 1} value={String(i + 1)}>Juz {i + 1}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select value={filterHalaqoh} onValueChange={setFilterHalaqoh}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {halaqohOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={selectedJuz} onValueChange={setSelectedJuz}>
+                <SelectTrigger className="w-full sm:w-[120px]">
+                  <SelectValue placeholder="Juz" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 30 }, (_, i) => (
+                    <SelectItem key={i + 1} value={String(i + 1)}>Juz {i + 1}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Drill Progress Cards - Mobile First */}
-        <div className="space-y-4">
-          {mockSantri
-            .filter(
-              s => selectedSantriFilter === "all" || s.id === selectedSantriFilter
-            )
-            .map(santri => {
-              const progress = getSantriProgress(santri.id) || {
-                santriId: santri.id,
-                juz: Number(selectedJuz),
-                drill1Completed: false,
-                drill2Completed: false,
-                drillHalfJuzCompleted: false,
-                drillFirstHalfJuz: false,
-                drillSecondHalfJuz: false,
-                tasmi1JuzUnlocked: false,
-                drillResults: [],
-              };
-
-              const totalTahap = [
-                progress.drill1Completed,
-                progress.drill2Completed,
-                progress.drillHalfJuzCompleted,
-                progress.drillFirstHalfJuz,
-                progress.drillSecondHalfJuz,
-              ].filter(Boolean).length;
-
-              const tasmiUnlocked =
-                progress.tasmi1JuzUnlocked ||
-                (progress.drillFirstHalfJuz && progress.drillSecondHalfJuz);
-
-              return (
-                <Card key={santri.id} className="overflow-hidden">
-                  {/* Header */}
-                  <div className="bg-gradient-to-r from-green-500 to-lime-500 p-3 md:p-4">
-                    <div className="flex items-center justify-between text-white">
-                      <div>
-                        <h3 className="font-bold text-lg">{santri.nama}</h3>
-                        <p className="text-sm opacity-90">
-                          {santri.halaqoh} • Juz {selectedJuz}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="bg-white/20 text-white border-0 hover:bg-white/30"
-                          onClick={() => openDetailDialog(santri.id)}
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          Detail
-                        </Button>
-                        <Badge className="bg-white/20 text-white border-0">
-                          {santri.nis}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-
-                  <CardContent className="p-3 md:p-4 space-y-3">
-                    {/* Tahap Awal */}
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Tahap Awal
-                      </p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <DrillCheckbox
-                          label="Drill 1"
-                          desc="5 Halaman/Surat"
-                          checked={progress.drill1Completed}
-                          unlocked
-                        />
-                        <DrillCheckbox
-                          label="Drill 2"
-                          desc="5 Halaman berikutnya"
-                          checked={progress.drill2Completed}
-                          unlocked={progress.drill1Completed}
-                        />
-                      </div>
-                    </div>
-
-                    {(progress.drill1Completed && progress.drill2Completed) && (
-                      <div className="flex justify-center">
-                        <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
-                      </div>
-                    )}
-
-                    {/* Drill ½ Juz */}
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Drill ½ Juz
-                      </p>
-                      <DrillCheckbox
-                        label="Drill ½ Juz"
-                        desc="10 Halaman"
-                        checked={progress.drillHalfJuzCompleted}
-                        unlocked={
-                          progress.drill1Completed && progress.drill2Completed
-                        }
-                        fullWidth
-                      />
-                    </div>
-
-                    {progress.drillHalfJuzCompleted && (
-                      <div className="flex justify-center">
-                        <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
-                      </div>
-                    )}
-
-                    {/* Persiapan 1 Juz */}
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Persiapan 1 Juz
-                      </p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <DrillCheckbox
-                          label="½ Juz Pertama"
-                          desc="Setengah awal"
-                          checked={progress.drillFirstHalfJuz}
-                          unlocked={progress.drillHalfJuzCompleted}
-                        />
-                        <DrillCheckbox
-                          label="½ Juz Kedua"
-                          desc="Setengah akhir"
-                          checked={progress.drillSecondHalfJuz}
-                          unlocked={
-                            progress.drillHalfJuzCompleted &&
-                            progress.drillFirstHalfJuz
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {(progress.drillFirstHalfJuz && progress.drillSecondHalfJuz) && (
-                      <div className="flex justify-center">
-                        <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
-                      </div>
-                    )}
-
-                    {/* Tasmi 1 Juz */}
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                        Ujian Akhir
-                      </p>
-                      <Card
-                        className={cn(
-                          "border-2 p-3",
-                          tasmiUnlocked
-                            ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30"
-                            : "border-muted bg-muted/30"
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={cn(
-                              "w-10 h-10 rounded-full flex items-center justify-center",
-                              tasmiUnlocked
-                                ? "bg-amber-400 text-white"
-                                : "bg-muted text-muted-foreground"
-                            )}
+            {/* Desktop Table */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-muted-foreground">NIS</TableHead>
+                    <TableHead className="text-muted-foreground">Nama Santri</TableHead>
+                    <TableHead className="text-muted-foreground">Halaqoh</TableHead>
+                    <TableHead className="text-muted-foreground">Tahap Saat Ini</TableHead>
+                    <TableHead className="text-muted-foreground">Drill Terakhir</TableHead>
+                    <TableHead className="text-muted-foreground">Nilai</TableHead>
+                    <TableHead className="text-muted-foreground">Progress</TableHead>
+                    <TableHead className="text-muted-foreground">Aksi</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSantri.map((santri) => {
+                    const { lastDrill, currentStage, progressPercent } = getLastDrillInfo(santri.id);
+                    return (
+                      <TableRow key={santri.id}>
+                        <TableCell className="font-medium">{santri.nis}</TableCell>
+                        <TableCell className="text-primary font-medium">{santri.nama}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto text-primary hover:underline"
+                            onClick={() => handleOpenCards(santri.halaqoh)}
                           >
-                            {tasmiUnlocked ? (
-                              <Unlock className="w-5 h-5" />
-                            ) : (
-                              <Lock className="w-5 h-5" />
+                            {santri.halaqoh}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-xs">
+                            {currentStage}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {lastDrill ? (
+                            <div className="text-sm">
+                              <p className="font-medium">{getDrillLevelName(lastDrill.drillLevel)}</p>
+                              <p className="text-xs text-muted-foreground">{format(lastDrill.tanggal, "dd/MM/yyyy")}</p>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {lastDrill ? (
+                            <Badge className={cn(
+                              lastDrill.lulus ? "bg-green-500" : "bg-destructive"
+                            )}>
+                              {lastDrill.nilaiKelancaran}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Progress value={progressPercent} className="h-2 w-16" />
+                            <span className="text-xs text-muted-foreground">{progressPercent}%</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => openDetailDialog(santri.id)}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Detail
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-3">
+              {filteredSantri.map((santri) => {
+                const { lastDrill, currentStage, progressPercent } = getLastDrillInfo(santri.id);
+                return (
+                  <Card key={santri.id} className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="font-semibold text-primary">{santri.nama}</p>
+                        <p className="text-xs text-muted-foreground">{santri.nis} • {santri.halaqoh}</p>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {currentStage}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                      <div>
+                        <p className="text-muted-foreground text-xs">Drill Terakhir</p>
+                        <p className="font-medium">{lastDrill ? getDrillLevelName(lastDrill.drillLevel) : "-"}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground text-xs">Nilai</p>
+                        {lastDrill ? (
+                          <Badge className={cn(
+                            "text-xs",
+                            lastDrill.lulus ? "bg-green-500" : "bg-destructive"
+                          )}>
+                            {lastDrill.nilaiKelancaran}
+                          </Badge>
+                        ) : (
+                          <span>-</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 flex-1">
+                        <Progress value={progressPercent} className="h-2" />
+                        <span className="text-xs text-muted-foreground">{progressPercent}%</span>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="ml-3"
+                        onClick={() => openDetailDialog(santri.id)}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          /* Cards View - Per Halaqoh */
+          <div className="space-y-4">
+            <Button variant="outline" onClick={handleBackToTable} className="mb-2">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Kembali ke Tabel
+            </Button>
+            
+            <Card>
+              <CardHeader className="bg-gradient-to-r from-green-500 to-lime-500 text-white rounded-t-lg">
+                <CardTitle>{selectedHalaqohForCards}</CardTitle>
+                <CardDescription className="text-white/80">
+                  {filteredSantriForCards.length} santri • Juz {selectedJuz}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-4 space-y-4">
+                {filteredSantriForCards.map(santri => {
+                  const progress = getSantriProgress(santri.id) || {
+                    santriId: santri.id,
+                    juz: Number(selectedJuz),
+                    drill1Completed: false,
+                    drill2Completed: false,
+                    drillHalfJuzCompleted: false,
+                    drillFirstHalfJuz: false,
+                    drillSecondHalfJuz: false,
+                    tasmi1JuzUnlocked: false,
+                    drillResults: [],
+                  };
+
+                  const totalTahap = [
+                    progress.drill1Completed,
+                    progress.drill2Completed,
+                    progress.drillHalfJuzCompleted,
+                    progress.drillFirstHalfJuz,
+                    progress.drillSecondHalfJuz,
+                  ].filter(Boolean).length;
+
+                  const tasmiUnlocked =
+                    progress.tasmi1JuzUnlocked ||
+                    (progress.drillFirstHalfJuz && progress.drillSecondHalfJuz);
+
+                  const { lastDrill } = getLastDrillInfo(santri.id);
+
+                  return (
+                    <Card key={santri.id} className="overflow-hidden border-l-4 border-l-primary">
+                      <CardContent className="p-4 space-y-4">
+                        {/* Header */}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="font-bold">{santri.nama}</h3>
+                            <p className="text-xs text-muted-foreground">{santri.nis}</p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openDetailDialog(santri.id)}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Detail
+                          </Button>
+                        </div>
+
+                        {/* Last Drill Info */}
+                        {lastDrill && (
+                          <div className="p-3 bg-muted/50 rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1">Drill Terakhir</p>
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium text-sm">{getDrillLevelName(lastDrill.drillLevel)}</p>
+                                <p className="text-xs text-muted-foreground">{format(lastDrill.tanggal, "dd/MM/yyyy")}</p>
+                              </div>
+                              <Badge className={cn(
+                                lastDrill.lulus ? "bg-green-500" : "bg-destructive"
+                              )}>
+                                Nilai: {lastDrill.nilaiKelancaran}
+                              </Badge>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Drill Progress */}
+                        <div className="space-y-2">
+                          <p className="text-xs font-medium text-muted-foreground uppercase">Tahapan Drill</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            <DrillCheckbox label="Drill 1" desc="5 Halaman" checked={progress.drill1Completed} unlocked />
+                            <DrillCheckbox label="Drill 2" desc="5 Halaman" checked={progress.drill2Completed} unlocked={progress.drill1Completed} />
+                          </div>
+                          <DrillCheckbox label="Drill ½ Juz" desc="10 Halaman" checked={progress.drillHalfJuzCompleted} unlocked={progress.drill1Completed && progress.drill2Completed} fullWidth />
+                          <div className="grid grid-cols-2 gap-2">
+                            <DrillCheckbox label="½ Juz Pertama" desc="Awal" checked={progress.drillFirstHalfJuz} unlocked={progress.drillHalfJuzCompleted} />
+                            <DrillCheckbox label="½ Juz Kedua" desc="Akhir" checked={progress.drillSecondHalfJuz} unlocked={progress.drillHalfJuzCompleted && progress.drillFirstHalfJuz} />
+                          </div>
+                        </div>
+
+                        {/* Tasmi Status */}
+                        <div className={cn(
+                          "p-3 rounded-lg border-2",
+                          tasmiUnlocked 
+                            ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30" 
+                            : "border-muted bg-muted/30"
+                        )}>
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "w-8 h-8 rounded-full flex items-center justify-center",
+                              tasmiUnlocked ? "bg-amber-400 text-white" : "bg-muted"
+                            )}>
+                              {tasmiUnlocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4 text-muted-foreground" />}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-semibold text-sm">🏆 Tasmi' 1 Juz</p>
+                              <p className="text-xs text-muted-foreground">
+                                {tasmiUnlocked ? "Siap ujian!" : "Selesaikan drill dulu"}
+                              </p>
+                            </div>
+                            {tasmiUnlocked && (
+                              <Button size="sm" className="bg-amber-500 hover:bg-amber-600">
+                                <Target className="w-4 h-4" />
+                              </Button>
                             )}
                           </div>
-
-                          <div className="flex-1">
-                            <p className="font-semibold">🏆 Tasmi' 1 Juz</p>
-                            <p className="text-xs text-muted-foreground">
-                              {tasmiUnlocked
-                                ? "Siap untuk ujian tasmi' 1 juz penuh!"
-                                : "Selesaikan semua drill untuk membuka"}
-                            </p>
-                          </div>
-
-                          {tasmiUnlocked && (
-                            <Button size="sm" className="bg-amber-500 hover:bg-amber-600">
-                              <Target className="w-4 h-4 mr-1" />
-                              Mulai
-                            </Button>
-                          )}
                         </div>
-                      </Card>
-                    </div>
 
-                    {/* Progress */}
-                    <div className="pt-4 border-t">
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-muted-foreground">
-                          Progress Juz {selectedJuz}
-                        </span>
-                        <span className="font-medium">{totalTahap}/5 tahap</span>
-                      </div>
-                      <Progress value={totalTahap * 20} className="h-2" />
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-        </div>
+                        {/* Progress Bar */}
+                        <div className="pt-2 border-t">
+                          <div className="flex justify-between text-xs mb-1">
+                            <span className="text-muted-foreground">Progress</span>
+                            <span className="font-medium">{totalTahap}/5 tahap</span>
+                          </div>
+                          <Progress value={totalTahap * 20} className="h-2" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Info Card */}
         <Card className="bg-muted/50">
@@ -901,7 +1049,7 @@ const DrillHafalan = () => {
                           {/* Surahs */}
                           <div className="space-y-2 mb-3">
                             <p className="text-xs font-medium text-muted-foreground uppercase">Materi Disetorkan:</p>
-                            {result.surahs.map((surah, idx) => (
+                            {result.surahs.map((surah) => (
                               <div key={surah.id} className="flex items-center gap-2 p-2 bg-muted/50 rounded text-sm">
                                 <BookOpen className="w-4 h-4 text-primary" />
                                 <span className="font-medium">{surah.surahName}</span>
@@ -950,36 +1098,36 @@ interface DrillCheckboxProps {
 
 const DrillCheckbox = ({ label, desc, checked, unlocked, fullWidth }: DrillCheckboxProps) => (
   <div className={cn(
-    "flex items-center gap-3 p-3 rounded-lg border transition-all",
+    "flex items-center gap-2 p-2 rounded-lg border transition-all",
     checked 
       ? "bg-green-50 border-green-300 dark:bg-green-950/30 dark:border-green-700" 
       : unlocked 
-        ? "bg-background border-border hover:border-primary/50" 
+        ? "bg-background border-border" 
         : "bg-muted/50 border-muted opacity-60",
     fullWidth && "col-span-2"
   )}>
     <div className={cn(
-      "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0",
+      "w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0",
       checked 
         ? "bg-green-500 text-white" 
         : unlocked 
-          ? "bg-muted border-2 border-border" 
+          ? "bg-muted border border-border" 
           : "bg-muted"
     )}>
       {checked ? (
-        <CheckCircle className="w-4 h-4" />
+        <CheckCircle className="w-3 h-3" />
       ) : unlocked ? null : (
-        <Lock className="w-3 h-3 text-muted-foreground" />
+        <Lock className="w-2.5 h-2.5 text-muted-foreground" />
       )}
     </div>
     <div className="min-w-0">
       <p className={cn(
-        "font-medium text-sm truncate",
+        "font-medium text-xs truncate",
         !unlocked && "text-muted-foreground"
       )}>
         {label}
       </p>
-      <p className="text-xs text-muted-foreground truncate">{desc}</p>
+      <p className="text-[10px] text-muted-foreground truncate">{desc}</p>
     </div>
   </div>
 );
