@@ -14,6 +14,7 @@ import {
   LogOut,
   Award,
   FileSpreadsheet,
+  School,
 } from "lucide-react";
 import {
   Sidebar,
@@ -44,6 +45,7 @@ const menuItems = [
 const masterDataItems = [
   { title: "Data Santri", url: "/santri", icon: Users },
   { title: "Data Halaqoh", url: "/halaqoh", icon: BookMarked },
+  { title: "Data Kelas", url: "/kelas", icon: School },
   { title: "Data Ustadz", url: "/ustadz", icon: GraduationCap },
   { title: "Akun Pengguna", url: "/users", icon: UserCog },
   { title: "Pengumuman", url: "/pengumuman", icon: Megaphone },

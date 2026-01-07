@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,27 +19,52 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Halaqoh {
+  id: string;
+  nama_halaqoh: string;
+}
+
+interface Kelas {
+  id: string;
+  nama_kelas: string;
+}
 
 const mockSantri = [
-  { id: "1", nis: "S001", nama: "Muhammad Faiz", halaqoh: "Halaqoh Al-Azhary", wali: "H. Abdullah (Wali Muhammad Faiz)", tanggalMasuk: "1/1/2024", status: "Aktif" },
-  { id: "2", nis: "S002", nama: "Ahmad Rizky", halaqoh: "Halaqoh Al-Azhary", wali: "Bapak Hasan (Wali Ahmad Rizky)", tanggalMasuk: "15/1/2024", status: "Aktif" },
-  { id: "3", nis: "S003", nama: "Fatimah Zahra", halaqoh: "Halaqoh Al-Furqon", wali: "Ibu Fatimah (Wali Fatimah Zahra)", tanggalMasuk: "1/2/2024", status: "Aktif" },
-  { id: "4", nis: "S004", nama: "Ali Akbar", halaqoh: "Halaqoh Al-Furqon", wali: "Bapak Ali (Wali Ali Akbar)", tanggalMasuk: "10/2/2024", status: "Aktif" },
-  { id: "5", nis: "S005", nama: "Aisyah Nur", halaqoh: "Halaqoh Al-Hidayah", wali: "Ibu Khadijah (Wali Aisyah Nur)", tanggalMasuk: "15/2/2024", status: "Aktif" },
-  { id: "6", nis: "S006", nama: "Umar Faruq", halaqoh: "Halaqoh Al-Hidayah", wali: "Bapak Umar (Wali Umar Faruq)", tanggalMasuk: "1/3/2024", status: "Aktif" },
+  { id: "1", nis: "S001", nama: "Muhammad Faiz", halaqoh: "Halaqoh Al-Azhary", kelas: "Paket A Kelas 6", wali: "H. Abdullah", tanggalMasuk: "1/1/2024", status: "Aktif" },
+  { id: "2", nis: "S002", nama: "Ahmad Rizky", halaqoh: "Halaqoh Al-Azhary", kelas: "Paket A Kelas 6", wali: "Bapak Hasan", tanggalMasuk: "15/1/2024", status: "Aktif" },
+  { id: "3", nis: "S003", nama: "Fatimah Zahra", halaqoh: "Halaqoh Al-Furqon", kelas: "KBTK A", wali: "Ibu Fatimah", tanggalMasuk: "1/2/2024", status: "Aktif" },
+  { id: "4", nis: "S004", nama: "Ali Akbar", halaqoh: "Halaqoh Al-Furqon", kelas: "Paket B Kelas 8", wali: "Bapak Ali", tanggalMasuk: "10/2/2024", status: "Aktif" },
+  { id: "5", nis: "S005", nama: "Aisyah Nur", halaqoh: "Halaqoh Al-Hidayah", kelas: "KBTK B", wali: "Ibu Khadijah", tanggalMasuk: "15/2/2024", status: "Aktif" },
+  { id: "6", nis: "S006", nama: "Umar Faruq", halaqoh: "Halaqoh Al-Hidayah", kelas: "Paket B Kelas 9", wali: "Bapak Umar", tanggalMasuk: "1/3/2024", status: "Aktif" },
 ];
-
-const halaqohOptions = ["Semua Halaqoh", "Halaqoh Al-Azhary", "Halaqoh Al-Furqon", "Halaqoh Al-Hidayah"];
 
 export default function DataSantri() {
   const [search, setSearch] = useState("");
-  const [filterHalaqoh, setFilterHalaqoh] = useState("Semua Halaqoh");
+  const [filterHalaqoh, setFilterHalaqoh] = useState("all");
+  const [filterKelas, setFilterKelas] = useState("all");
+  const [halaqohList, setHalaqohList] = useState<Halaqoh[]>([]);
+  const [kelasList, setKelasList] = useState<Kelas[]>([]);
+
+  useEffect(() => {
+    const fetchFilters = async () => {
+      const [halaqohRes, kelasRes] = await Promise.all([
+        supabase.from("halaqoh").select("id, nama_halaqoh").order("nama_halaqoh"),
+        supabase.from("kelas").select("id, nama_kelas").order("nama_kelas"),
+      ]);
+      if (halaqohRes.data) setHalaqohList(halaqohRes.data);
+      if (kelasRes.data) setKelasList(kelasRes.data);
+    };
+    fetchFilters();
+  }, []);
 
   const filteredSantri = mockSantri.filter((santri) => {
     const matchSearch = santri.nama.toLowerCase().includes(search.toLowerCase()) ||
       santri.nis.toLowerCase().includes(search.toLowerCase());
-    const matchHalaqoh = filterHalaqoh === "Semua Halaqoh" || santri.halaqoh === filterHalaqoh;
-    return matchSearch && matchHalaqoh;
+    const matchHalaqoh = filterHalaqoh === "all" || santri.halaqoh === filterHalaqoh;
+    const matchKelas = filterKelas === "all" || santri.kelas === filterKelas;
+    return matchSearch && matchHalaqoh && matchKelas;
   });
 
   return (
@@ -65,13 +90,27 @@ export default function DataSantri() {
               />
             </div>
             <Select value={filterHalaqoh} onValueChange={setFilterHalaqoh}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <SelectValue />
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Semua Halaqoh" />
               </SelectTrigger>
               <SelectContent>
-                {halaqohOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
+                <SelectItem value="all">Semua Halaqoh</SelectItem>
+                {halaqohList.map((h) => (
+                  <SelectItem key={h.id} value={h.nama_halaqoh}>
+                    {h.nama_halaqoh}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filterKelas} onValueChange={setFilterKelas}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Semua Kelas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Semua Kelas</SelectItem>
+                {kelasList.map((k) => (
+                  <SelectItem key={k.id} value={k.nama_kelas}>
+                    {k.nama_kelas}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -84,6 +123,7 @@ export default function DataSantri() {
                 <TableHead className="text-muted-foreground">NIS</TableHead>
                 <TableHead className="text-muted-foreground">Nama Santri</TableHead>
                 <TableHead className="text-muted-foreground">Halaqoh</TableHead>
+                <TableHead className="text-muted-foreground">Kelas</TableHead>
                 <TableHead className="text-muted-foreground">Wali Santri</TableHead>
                 <TableHead className="text-muted-foreground">Tanggal Masuk</TableHead>
                 <TableHead className="text-muted-foreground">Status</TableHead>
@@ -96,6 +136,7 @@ export default function DataSantri() {
                   <TableCell className="font-medium">{santri.nis}</TableCell>
                   <TableCell className="text-primary font-medium">{santri.nama}</TableCell>
                   <TableCell className="text-primary">{santri.halaqoh}</TableCell>
+                  <TableCell>{santri.kelas}</TableCell>
                   <TableCell>{santri.wali}</TableCell>
                   <TableCell>{santri.tanggalMasuk}</TableCell>
                   <TableCell>

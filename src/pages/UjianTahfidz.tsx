@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,8 +34,19 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { GraduationCap, Plus, Eye, AlertCircle, CheckCircle2, Info } from "lucide-react";
+import { GraduationCap, Plus, AlertCircle, CheckCircle2, Info, Eye } from "lucide-react";
 import { JuzSelector } from "@/components/JuzSelector";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Halaqoh {
+  id: string;
+  nama_halaqoh: string;
+}
+
+interface Kelas {
+  id: string;
+  nama_kelas: string;
+}
 
 const UjianTahfidz = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -45,6 +56,10 @@ const UjianTahfidz = () => {
   const [materiDari, setMateriDari] = useState("");
   const [materiSampai, setMateriSampai] = useState("");
   const [catatan, setCatatan] = useState("");
+  const [filterHalaqoh, setFilterHalaqoh] = useState("all");
+  const [filterKelas, setFilterKelas] = useState("all");
+  const [halaqohList, setHalaqohList] = useState<Halaqoh[]>([]);
+  const [kelasList, setKelasList] = useState<Kelas[]>([]);
   
   // State untuk 10 soal - setiap soal memiliki halaman dan pengurangan nilai
   const [soalData, setSoalData] = useState<Array<{
@@ -57,11 +72,23 @@ const UjianTahfidz = () => {
     }))
   );
 
+  useEffect(() => {
+    const fetchFilters = async () => {
+      const [halaqohRes, kelasRes] = await Promise.all([
+        supabase.from("halaqoh").select("id, nama_halaqoh").order("nama_halaqoh"),
+        supabase.from("kelas").select("id, nama_kelas").order("nama_kelas"),
+      ]);
+      if (halaqohRes.data) setHalaqohList(halaqohRes.data);
+      if (kelasRes.data) setKelasList(kelasRes.data);
+    };
+    fetchFilters();
+  }, []);
+
   // Dummy data
   const santriList = [
-    { id: "1", nama: "Ahmad Fauzi", nis: "2024001", halaqoh: "Halaqoh A" },
-    { id: "2", nama: "Muhammad Rizki", nis: "2024002", halaqoh: "Halaqoh A" },
-    { id: "3", nama: "Abdullah Rahman", nis: "2024003", halaqoh: "Halaqoh B" },
+    { id: "1", nama: "Ahmad Fauzi", nis: "2024001", halaqoh: "Halaqoh A", kelas: "Paket A Kelas 6" },
+    { id: "2", nama: "Muhammad Rizki", nis: "2024002", halaqoh: "Halaqoh A", kelas: "Paket A Kelas 6" },
+    { id: "3", nama: "Abdullah Rahman", nis: "2024003", halaqoh: "Halaqoh B", kelas: "KBTK A" },
   ];
 
   const asatidzList = [
@@ -71,23 +98,15 @@ const UjianTahfidz = () => {
   ];
 
   const ujianHistory = [
-    {
-      id: "1",
-      santri: "Ahmad Fauzi",
-      tanggal: "2024-01-15",
-      materi: "Juz 1-2",
-      nilaiTotal: 85,
-      status: "Lulus",
-    },
-    {
-      id: "2",
-      santri: "Muhammad Rizki",
-      tanggal: "2024-01-14",
-      materi: "Juz 1-2",
-      nilaiTotal: 65,
-      status: "Tidak Lulus",
-    },
+    { id: "1", santri: "Ahmad Fauzi", tanggal: "2024-01-15", materi: "Juz 1-2", nilaiTotal: 85, status: "Lulus" },
+    { id: "2", santri: "Muhammad Rizki", tanggal: "2024-01-14", materi: "Juz 1-2", nilaiTotal: 65, status: "Tidak Lulus" },
   ];
+
+  const filteredSantriList = santriList.filter((s) => {
+    const matchHalaqoh = filterHalaqoh === "all" || s.halaqoh === filterHalaqoh;
+    const matchKelas = filterKelas === "all" || s.kelas === filterKelas;
+    return matchHalaqoh && matchKelas;
+  });
 
   const handlePenguranganChange = (index: number, value: number) => {
     const newSoalData = [...soalData];
@@ -200,6 +219,42 @@ const UjianTahfidz = () => {
                   </CardContent>
                 </Card>
 
+                {/* Filter Halaqoh & Kelas */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Filter Halaqoh</Label>
+                    <Select value={filterHalaqoh} onValueChange={setFilterHalaqoh}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Semua Halaqoh" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Semua Halaqoh</SelectItem>
+                        {halaqohList.map((h) => (
+                          <SelectItem key={h.id} value={h.nama_halaqoh}>
+                            {h.nama_halaqoh}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Filter Kelas</Label>
+                    <Select value={filterKelas} onValueChange={setFilterKelas}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Semua Kelas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Semua Kelas</SelectItem>
+                        {kelasList.map((k) => (
+                          <SelectItem key={k.id} value={k.nama_kelas}>
+                            {k.nama_kelas}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 {/* Data Ujian */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -209,7 +264,7 @@ const UjianTahfidz = () => {
                         <SelectValue placeholder="Pilih santri" />
                       </SelectTrigger>
                       <SelectContent>
-                        {santriList.map((santri) => (
+                        {filteredSantriList.map((santri) => (
                           <SelectItem key={santri.id} value={santri.id}>
                             {santri.nama} - {santri.nis}
                           </SelectItem>

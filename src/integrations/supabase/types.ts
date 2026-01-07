@@ -79,6 +79,30 @@ export type Database = {
         }
         Relationships: []
       }
+      kelas: {
+        Row: {
+          created_at: string
+          deskripsi: string | null
+          id: string
+          nama_kelas: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deskripsi?: string | null
+          id?: string
+          nama_kelas: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deskripsi?: string | null
+          id?: string
+          nama_kelas?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       log_aktivitas: {
         Row: {
           aksi: string
@@ -212,6 +236,7 @@ export type Database = {
           created_at: string | null
           id: string
           id_halaqoh: string | null
+          id_kelas: string | null
           id_wali: string | null
           nama_santri: string
           nis: string
@@ -223,6 +248,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           id_halaqoh?: string | null
+          id_kelas?: string | null
           id_wali?: string | null
           nama_santri: string
           nis: string
@@ -234,6 +260,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           id_halaqoh?: string | null
+          id_kelas?: string | null
           id_wali?: string | null
           nama_santri?: string
           nis?: string
@@ -247,6 +274,13 @@ export type Database = {
             columns: ["id_halaqoh"]
             isOneToOne: false
             referencedRelation: "halaqoh"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "santri_id_kelas_fkey"
+            columns: ["id_kelas"]
+            isOneToOne: false
+            referencedRelation: "kelas"
             referencedColumns: ["id"]
           },
         ]
