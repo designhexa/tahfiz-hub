@@ -35,6 +35,12 @@ import { JuzSelector } from "@/components/JuzSelector";
 import { getSurahsByJuz, Surah } from "@/lib/quran-data";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 // Types for drill progression
 interface DrillSurahEntry {
@@ -589,7 +595,9 @@ const DrillHafalan = () => {
         {/* Drill Progress Cards - Mobile First */}
         <div className="space-y-4">
           {mockSantri
-            .filter(s => selectedSantriFilter === "all" || s.id === selectedSantriFilter)
+            .filter(
+              s => selectedSantriFilter === "all" || s.id === selectedSantriFilter
+            )
             .map(santri => {
               const progress = getSantriProgress(santri.id) || {
                 santriId: santri.id,
@@ -603,18 +611,32 @@ const DrillHafalan = () => {
                 drillResults: [],
               };
 
+              const totalTahap = [
+                progress.drill1Completed,
+                progress.drill2Completed,
+                progress.drillHalfJuzCompleted,
+                progress.drillFirstHalfJuz,
+                progress.drillSecondHalfJuz,
+              ].filter(Boolean).length;
+
+              const tasmiUnlocked =
+                progress.tasmi1JuzUnlocked ||
+                (progress.drillFirstHalfJuz && progress.drillSecondHalfJuz);
+
               return (
                 <Card key={santri.id} className="overflow-hidden">
-                  {/* Santri Header */}
+                  {/* Header */}
                   <div className="bg-gradient-to-r from-green-500 to-lime-500 p-3 md:p-4">
                     <div className="flex items-center justify-between text-white">
                       <div>
                         <h3 className="font-bold text-lg">{santri.nama}</h3>
-                        <p className="text-sm opacity-90">{santri.halaqoh} • Juz {selectedJuz}</p>
+                        <p className="text-sm opacity-90">
+                          {santri.halaqoh} • Juz {selectedJuz}
+                        </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant="secondary"
                           className="bg-white/20 text-white border-0 hover:bg-white/30"
                           onClick={() => openDetailDialog(santri.id)}
@@ -622,154 +644,150 @@ const DrillHafalan = () => {
                           <Eye className="w-4 h-4 mr-1" />
                           Detail
                         </Button>
-                        <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                        <Badge className="bg-white/20 text-white border-0">
                           {santri.nis}
                         </Badge>
                       </div>
                     </div>
                   </div>
 
-                  <CardContent className="p-3 md:p-4">
-                    {/* Drill Progression - Visual Timeline */}
-                    <div className="space-y-3">
-                      {/* Phase 1: Drill 1 & 2 */}
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Tahap Awal</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <DrillCheckbox 
-                            label="Drill 1" 
-                            desc="5 Halaman/Surat"
-                            checked={progress.drill1Completed}
-                            unlocked={true}
-                          />
-                          <DrillCheckbox 
-                            label="Drill 2" 
-                            desc="5 Halaman berikutnya"
-                            checked={progress.drill2Completed}
-                            unlocked={progress.drill1Completed}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Arrow indicator */}
-                      {(progress.drill1Completed && progress.drill2Completed) && (
-                        <div className="flex justify-center">
-                          <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
-                        </div>
-                      )}
-
-                      {/* Phase 2: Half Juz */}
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Drill ½ Juz</p>
-                        <DrillCheckbox 
-                          label="Drill ½ Juz" 
-                          desc="10 Halaman"
-                          checked={progress.drillHalfJuzCompleted}
-                          unlocked={progress.drill1Completed && progress.drill2Completed}
-                          fullWidth
+                  <CardContent className="p-3 md:p-4 space-y-3">
+                    {/* Tahap Awal */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Tahap Awal
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <DrillCheckbox
+                          label="Drill 1"
+                          desc="5 Halaman/Surat"
+                          checked={progress.drill1Completed}
+                          unlocked
                         />
-                      </div>
-
-                      {/* Arrow indicator */}
-                      {progress.drillHalfJuzCompleted && (
-                        <div className="flex justify-center">
-                          <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
-                        </div>
-                      )}
-
-                      {/* Phase 3: Full Juz Preparation */}
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Persiapan 1 Juz</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <DrillCheckbox 
-                            label="½ Juz Pertama" 
-                            desc="Setengah awal"
-                            checked={progress.drillFirstHalfJuz}
-                            unlocked={progress.drillHalfJuzCompleted}
-                          />
-                          <DrillCheckbox 
-                            label="½ Juz Kedua" 
-                            desc="Setengah akhir"
-                            checked={progress.drillSecondHalfJuz}
-                            unlocked={progress.drillHalfJuzCompleted && progress.drillFirstHalfJuz}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Arrow indicator */}
-                      {(progress.drillFirstHalfJuz && progress.drillSecondHalfJuz) && (
-                        <div className="flex justify-center">
-                          <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
-                        </div>
-                      )}
-
-                      {/* Phase 4: Tasmi 1 Juz */}
-                      <div className="space-y-2">
-                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Ujian Akhir</p>
-                        <Card className={cn(
-                          "border-2 p-3",
-                          progress.drillFirstHalfJuz && progress.drillSecondHalfJuz
-                            ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30"
-                            : "border-muted bg-muted/30"
-                        )}>
-                          <div className="flex items-center gap-3">
-                            <div className={cn(
-                              "w-10 h-10 rounded-full flex items-center justify-center",
-                              progress.drillFirstHalfJuz && progress.drillSecondHalfJuz
-                                ? "bg-amber-400 text-white"
-                                : "bg-muted text-muted-foreground"
-                            )}>
-                              {progress.drillFirstHalfJuz && progress.drillSecondHalfJuz 
-                                ? <Unlock className="w-5 h-5" /> 
-                                : <Lock className="w-5 h-5" />
-                              }
-                            </div>
-                            <div className="flex-1">
-                              <p className="font-semibold">🏆 Tasmi' 1 Juz</p>
-                              <p className="text-xs text-muted-foreground">
-                                {progress.drillFirstHalfJuz && progress.drillSecondHalfJuz 
-                                  ? "Siap untuk ujian tasmi' 1 juz penuh!"
-                                  : "Selesaikan semua drill untuk membuka"
-                                }
-                              </p>
-                            </div>
-                            {progress.drillFirstHalfJuz && progress.drillSecondHalfJuz && (
-                              <Button size="sm" className="bg-amber-500 hover:bg-amber-600">
-                                <Target className="w-4 h-4 mr-1" />
-                                Mulai
-                              </Button>
-                            )}
-                          </div>
-                        </Card>
+                        <DrillCheckbox
+                          label="Drill 2"
+                          desc="5 Halaman berikutnya"
+                          checked={progress.drill2Completed}
+                          unlocked={progress.drill1Completed}
+                        />
                       </div>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="mt-4 pt-4 border-t">
-                      <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-muted-foreground">Progress Juz {selectedJuz}</span>
-                        <span className="font-medium">
-                          {[
-                            progress.drill1Completed,
-                            progress.drill2Completed,
-                            progress.drillHalfJuzCompleted,
-                            progress.drillFirstHalfJuz,
-                            progress.drillSecondHalfJuz,
-                          ].filter(Boolean).length}/5 tahap
-                        </span>
+                    {(progress.drill1Completed && progress.drill2Completed) && (
+                      <div className="flex justify-center">
+                        <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
                       </div>
-                      <Progress 
-                        value={
-                          [
-                            progress.drill1Completed,
-                            progress.drill2Completed,
-                            progress.drillHalfJuzCompleted,
-                            progress.drillFirstHalfJuz,
-                            progress.drillSecondHalfJuz,
-                          ].filter(Boolean).length * 20
-                        } 
-                        className="h-2" 
+                    )}
+
+                    {/* Drill ½ Juz */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Drill ½ Juz
+                      </p>
+                      <DrillCheckbox
+                        label="Drill ½ Juz"
+                        desc="10 Halaman"
+                        checked={progress.drillHalfJuzCompleted}
+                        unlocked={
+                          progress.drill1Completed && progress.drill2Completed
+                        }
+                        fullWidth
                       />
+                    </div>
+
+                    {progress.drillHalfJuzCompleted && (
+                      <div className="flex justify-center">
+                        <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
+                      </div>
+                    )}
+
+                    {/* Persiapan 1 Juz */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Persiapan 1 Juz
+                      </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <DrillCheckbox
+                          label="½ Juz Pertama"
+                          desc="Setengah awal"
+                          checked={progress.drillFirstHalfJuz}
+                          unlocked={progress.drillHalfJuzCompleted}
+                        />
+                        <DrillCheckbox
+                          label="½ Juz Kedua"
+                          desc="Setengah akhir"
+                          checked={progress.drillSecondHalfJuz}
+                          unlocked={
+                            progress.drillHalfJuzCompleted &&
+                            progress.drillFirstHalfJuz
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    {(progress.drillFirstHalfJuz && progress.drillSecondHalfJuz) && (
+                      <div className="flex justify-center">
+                        <ChevronRight className="w-5 h-5 text-green-500 rotate-90" />
+                      </div>
+                    )}
+
+                    {/* Tasmi 1 Juz */}
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Ujian Akhir
+                      </p>
+                      <Card
+                        className={cn(
+                          "border-2 p-3",
+                          tasmiUnlocked
+                            ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30"
+                            : "border-muted bg-muted/30"
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={cn(
+                              "w-10 h-10 rounded-full flex items-center justify-center",
+                              tasmiUnlocked
+                                ? "bg-amber-400 text-white"
+                                : "bg-muted text-muted-foreground"
+                            )}
+                          >
+                            {tasmiUnlocked ? (
+                              <Unlock className="w-5 h-5" />
+                            ) : (
+                              <Lock className="w-5 h-5" />
+                            )}
+                          </div>
+
+                          <div className="flex-1">
+                            <p className="font-semibold">🏆 Tasmi' 1 Juz</p>
+                            <p className="text-xs text-muted-foreground">
+                              {tasmiUnlocked
+                                ? "Siap untuk ujian tasmi' 1 juz penuh!"
+                                : "Selesaikan semua drill untuk membuka"}
+                            </p>
+                          </div>
+
+                          {tasmiUnlocked && (
+                            <Button size="sm" className="bg-amber-500 hover:bg-amber-600">
+                              <Target className="w-4 h-4 mr-1" />
+                              Mulai
+                            </Button>
+                          )}
+                        </div>
+                      </Card>
+                    </div>
+
+                    {/* Progress */}
+                    <div className="pt-4 border-t">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-muted-foreground">
+                          Progress Juz {selectedJuz}
+                        </span>
+                        <span className="font-medium">{totalTahap}/5 tahap</span>
+                      </div>
+                      <Progress value={totalTahap * 20} className="h-2" />
                     </div>
                   </CardContent>
                 </Card>
