@@ -46,6 +46,7 @@ import {
   ChevronUp
 } from "lucide-react";
 import { getJuzName } from "@/lib/quran-data";
+import { JuzSelector } from "@/components/JuzSelector";
 
 const JUZ_ORDER = [30, 29, 28, 27, 26, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
 
@@ -135,7 +136,7 @@ const UjianTasmi = () => {
                 <div className="space-y-6 py-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2"><Label>Santri</Label><Select value={selectedSantri} onValueChange={setSelectedSantri}><SelectTrigger><SelectValue placeholder="Pilih santri" /></SelectTrigger><SelectContent>{dummySantri.map((s) => (<SelectItem key={s.id} value={s.id}>{s.nama}</SelectItem>))}</SelectContent></Select></div>
-                    <div className="space-y-2"><Label>Juz</Label><Select value={selectedJuz} onValueChange={setSelectedJuz}><SelectTrigger><SelectValue placeholder="Pilih juz" /></SelectTrigger><SelectContent>{JUZ_ORDER.map((juz) => (<SelectItem key={juz} value={juz.toString()}>{getJuzName(juz)}</SelectItem>))}</SelectContent></Select></div>
+                    <JuzSelector value={selectedJuz} onValueChange={setSelectedJuz} label="Juz" required />
                   </div>
                   <Card className={`${predikat.passed ? 'border-green-500/50 bg-green-500/5' : 'border-red-500/50 bg-red-500/5'}`}><CardContent className="p-4"><div className="flex items-center justify-between"><div><p className="text-sm text-muted-foreground">Nilai Total</p><p className="text-3xl font-bold">{nilaiTotal}</p></div><div className="text-right"><p className="text-sm text-muted-foreground">Predikat</p><Badge className={`${predikat.color} text-white`}>{predikat.label}</Badge></div></div></CardContent></Card>
                   <div className="space-y-3"><Label className="text-base font-semibold">Penilaian Per Halaman</Label><p className="text-xs text-muted-foreground">Nilai per halaman: 5 poin. Maks 5 pancingan/halaman.</p>
@@ -163,7 +164,7 @@ const UjianTasmi = () => {
                         <AccordionItem key={juzIndex} value={`juz-${juzIndex}`} className="border rounded-lg px-4">
                           <AccordionTrigger className="hover:no-underline"><div className="flex items-center gap-3"><Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-200">Juz {juzIndex + 1}</Badge>{selectedJuzList[juzIndex] ? <span className="text-sm font-medium">{getJuzName(selectedJuzList[juzIndex])}{penilaian5Juz[juzIndex] && <span className="text-muted-foreground ml-2">(Nilai: {penilaian5Juz[juzIndex].halaman.reduce((t, h) => t + Math.max(0, 5 - h.pancingan), 0)}/100)</span>}</span> : <span className="text-sm text-muted-foreground">Pilih juz...</span>}</div></AccordionTrigger>
                           <AccordionContent className="pt-4 space-y-4">
-                            <div className="space-y-2"><Label>Pilih Juz</Label><Select value={selectedJuzList[juzIndex]?.toString() || ""} onValueChange={(v) => handleSelectJuz5Juz(juzIndex, v)}><SelectTrigger><SelectValue placeholder="Pilih juz" /></SelectTrigger><SelectContent>{JUZ_ORDER.filter(j => !selectedJuzList.includes(j) || selectedJuzList[juzIndex] === j).map((juz) => (<SelectItem key={juz} value={juz.toString()}>{getJuzName(juz)}</SelectItem>))}</SelectContent></Select></div>
+                            <JuzSelector value={selectedJuzList[juzIndex]?.toString() || ""} onValueChange={(v) => handleSelectJuz5Juz(juzIndex, v)} label="Pilih Juz" />
                             {penilaian5Juz[juzIndex] && (<><div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 gap-2">{penilaian5Juz[juzIndex].halaman.map((h, hIdx) => (<div key={hIdx} className="flex items-center gap-1.5 p-1.5 border rounded-md bg-card"><span className="text-xs font-medium whitespace-nowrap">Hal {h.halaman} <span className="text-muted-foreground">({Math.max(0, 5 - h.pancingan)})</span></span><div className="flex items-center gap-0.5 ml-auto"><Button type="button" variant="outline" size="sm" className="h-6 w-6 p-0 text-xs" onClick={() => { const n = [...penilaian5Juz]; n[juzIndex].halaman[hIdx].pancingan = Math.max(0, n[juzIndex].halaman[hIdx].pancingan - 1); setPenilaian5Juz(n); }}>-</Button><span className="w-5 text-center text-xs font-medium">{h.pancingan}</span><Button type="button" variant="outline" size="sm" className="h-6 w-6 p-0 text-xs" onClick={() => { const n = [...penilaian5Juz]; n[juzIndex].halaman[hIdx].pancingan = Math.min(5, n[juzIndex].halaman[hIdx].pancingan + 1); setPenilaian5Juz(n); }}>+</Button></div></div>))}</div><div className="space-y-2"><Label>Catatan {getJuzName(selectedJuzList[juzIndex])}</Label><Textarea placeholder="Catatan tajwid..." value={penilaian5Juz[juzIndex].catatanJuz} onChange={(e) => { const n = [...penilaian5Juz]; n[juzIndex].catatanJuz = e.target.value; setPenilaian5Juz(n); }} rows={2} /></div></>)}
                           </AccordionContent>
                         </AccordionItem>
