@@ -20,13 +20,13 @@ const RaporSemester = () => {
     },
     {
       icon: BookOpen,
-      title: "Progress 5 Manzil Tahfidz",
-      description: "Visualisasi progress melalui 5 tahapan manzil (3-5 baris, halaman, 5 halaman, 1/2 juz, 1 juz)"
+      title: "Progress Drill Hafalan",
+      description: "Visualisasi progress melalui tahapan drill (Drill 1 & 2, ½ Juz, 1 Juz)"
     },
     {
       icon: CheckCircle,
       title: "Gabungan Data Penilaian",
-      description: "Integrasi data setoran harian dan tasmi' marhalah dalam satu rapor"
+      description: "Integrasi data setoran harian dan drill hafalan dalam satu rapor"
     },
     {
       icon: FileText,

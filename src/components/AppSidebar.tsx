@@ -35,7 +35,8 @@ const menuItems = [
   { title: "Absensi Setoran", url: "/absensi", icon: UserCheck },
   { title: "Setoran Hafalan", url: "/setoran", icon: BookOpen },
   { title: "Laporan Hafalan", url: "/laporan", icon: FileText },
-  { title: "Tasmi' Marhalah", url: "/tasmi", icon: Award },
+  { title: "Drill Hafalan", url: "/drill", icon: ClipboardCheck },
+  { title: "Ujian Tasmi'", url: "/ujian-tasmi", icon: Award },
   { title: "Rapor Tahfidz", url: "/rapor", icon: FileSpreadsheet },
 ];
 
