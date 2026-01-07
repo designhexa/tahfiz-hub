@@ -34,10 +34,22 @@ const mockCapaianJuz = [
   { juz: 5, santriSelesai: 15, totalSantri: 50, persentase: 30 },
 ];
 
+const mockSantri = [
+  { id: "1", nama: "Muhammad Faiz", halaqoh: "azhary" },
+  { id: "2", nama: "Fatimah Zahra", halaqoh: "azhary" },
+  { id: "3", nama: "Aisyah Nur", halaqoh: "furqon" },
+  { id: "4", nama: "Ahmad Rasyid", halaqoh: "furqon" },
+];
+
 const LaporanHafalan = () => {
   const [filterPeriode, setFilterPeriode] = useState("bulanan");
   const [filterHalaqoh, setFilterHalaqoh] = useState("all");
   const [filterBulan, setFilterBulan] = useState("januari");
+  const [filterSantri, setFilterSantri] = useState("all");
+
+  const filteredSantri = filterHalaqoh === "all" 
+    ? mockSantri 
+    : mockSantri.filter(s => s.halaqoh === filterHalaqoh);
 
   const handleExportPDF = () => {
     toast.success("Laporan berhasil diexport ke PDF!");
@@ -127,7 +139,7 @@ const LaporanHafalan = () => {
         {/* Filters */}
         <Card>
           <CardContent className="pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Periode</label>
                 <Select value={filterPeriode} onValueChange={setFilterPeriode}>
@@ -156,7 +168,7 @@ const LaporanHafalan = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Halaqoh</label>
-                <Select value={filterHalaqoh} onValueChange={setFilterHalaqoh}>
+                <Select value={filterHalaqoh} onValueChange={(v) => { setFilterHalaqoh(v); setFilterSantri("all"); }}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -164,6 +176,20 @@ const LaporanHafalan = () => {
                     <SelectItem value="all">Semua Halaqoh</SelectItem>
                     <SelectItem value="azhary">Halaqoh Al-Azhary</SelectItem>
                     <SelectItem value="furqon">Halaqoh Al-Furqon</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Santri</label>
+                <Select value={filterSantri} onValueChange={setFilterSantri}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Santri</SelectItem>
+                    {filteredSantri.map((santri) => (
+                      <SelectItem key={santri.id} value={santri.id}>{santri.nama}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
