@@ -239,7 +239,7 @@ const UjianTasmi = () => {
                     Nilai per halaman: 5 poin. Setiap pancingan mengurangi 1 poin. Maks 5 pancingan/halaman.
                   </p>
                   
-                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 gap-2">
                     {penilaianHalaman.map((h, idx) => (
                       <div key={idx} className="flex items-center gap-1.5 p-1.5 border rounded-md bg-card">
                         <span className="text-xs font-medium whitespace-nowrap">
