@@ -10,7 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import SetoranHafalan from "./pages/SetoranHafalan";
 import AbsensiSetoran from "./pages/AbsensiSetoran";
 import LaporanHafalan from "./pages/LaporanHafalan";
-import TasmiMarhalah from "./pages/TasmiMarhalah";
+import DrillHafalan from "./pages/DrillHafalan";
+import UjianTasmi from "./pages/UjianTasmi";
 import RaporSemester from "./pages/RaporSemester";
 import DataSantri from "./pages/DataSantri";
 import DataHalaqoh from "./pages/DataHalaqoh";
@@ -35,7 +36,8 @@ const App = () => (
             <Route path="/absensi" element={<AbsensiSetoran />} />
             <Route path="/setoran" element={<SetoranHafalan />} />
             <Route path="/laporan" element={<LaporanHafalan />} />
-            <Route path="/tasmi" element={<TasmiMarhalah />} />
+            <Route path="/drill" element={<DrillHafalan />} />
+            <Route path="/ujian-tasmi" element={<UjianTasmi />} />
             <Route path="/rapor" element={<RaporSemester />} />
             <Route path="/santri" element={<DataSantri />} />
             <Route path="/halaqoh" element={<DataHalaqoh />} />
