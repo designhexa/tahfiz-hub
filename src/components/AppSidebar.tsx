@@ -50,13 +50,13 @@ const tilawahItems = [
   { title: "Absensi/Setoran Tilawah", url: "/tilawah/absensi", icon: BookOpenCheck },
   { title: "Laporan Tilawah", url: "/tilawah/laporan", icon: FileText },
   { title: "Ujian Tilawah Semester", url: "/tilawah/ujian", icon: Award },
-  { title: "Generate Rapor Tilawah", url: "/tilawah/rapor", icon: FileSpreadsheet },
+  { title: "Rapor Tilawah", url: "/tilawah/rapor", icon: FileSpreadsheet },
 ];
 
 const raporAkademikItems = [
   { title: "Dashboard", url: "/akademik/dashboard", icon: LayoutDashboard },
   { title: "Impor Data Nilai", url: "/akademik/impor", icon: Import },
-  { title: "Generate Rapor Akademik", url: "/akademik/rapor", icon: FileSpreadsheet },
+  { title: "Rapor Akademik", url: "/akademik/rapor", icon: FileSpreadsheet },
 ];
 
 const masterDataItems = [
