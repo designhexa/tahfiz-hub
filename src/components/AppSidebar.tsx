@@ -33,6 +33,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 const tahfidzItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -68,6 +70,8 @@ const masterDataItems = [
   { title: "Pengumuman", url: "/pengumuman", icon: Megaphone },
 ];
 
+
+
 export function AppSidebar() {
   const { open } = useSidebar();
   const location = useLocation();
@@ -84,6 +88,54 @@ export function AppSidebar() {
       navigate("/auth");
     }
   };
+
+    const SidebarDropdown = ({
+      label,
+      icon: Icon,
+      items,
+    }: {
+      label: string;
+      icon: any;
+      items: any[];
+    }) => {
+      const location = useLocation();
+      const [open, setOpen] = useState(
+        items.some((i) => location.pathname.startsWith(i.url))
+      );
+
+      return (
+        <SidebarMenu>
+          {/* Parent */}
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={() => setOpen(!open)}>
+              <Icon className="w-4 h-4" />
+              <span className="flex-1">{label}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${
+                  open ? "rotate-180" : ""
+                }`}
+              />
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
+          {/* Children */}
+          {open &&
+            items.map((item) => (
+              <SidebarMenuItem key={item.url} className="ml-6">
+                <SidebarMenuButton
+                  asChild
+                  isActive={location.pathname === item.url}
+                >
+                  <NavLink to={item.url}>
+                    <item.icon className="w-4 h-4" />
+                    <span>{item.title}</span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+        </SidebarMenu>
+      );
+    };
 
   return (
     <Sidebar className="border-r border-border bg-card">
@@ -105,77 +157,45 @@ export function AppSidebar() {
 
         {/* Tahfidz Menu */}
         <SidebarGroup>
-          <SidebarGroupLabel>Tahfidz</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {tahfidzItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url}>
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <SidebarDropdown
+              label="Tahfidz"
+              icon={BookOpen}
+              items={tahfidzItems}
+            />
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Tilawah Menu */}
         <SidebarGroup>
-          <SidebarGroupLabel>Tilawah</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {tilawahItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url}>
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <SidebarDropdown
+              label="Tilawah"
+              icon={BookOpenCheck}
+              items={tilawahItems}
+            />
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Rapor Akademik Menu */}
         <SidebarGroup>
-          <SidebarGroupLabel>Rapor Akademik</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {raporAkademikItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url}>
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <SidebarDropdown
+              label="Akademik"
+              icon={GraduationCap}
+              items={raporAkademikItems}
+            />
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Master Data */}
         <SidebarGroup>
-          <SidebarGroupLabel>Master Data</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {masterDataItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
-                    <NavLink to={item.url}>
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <SidebarDropdown
+              label="Master Data"
+              icon={Users}
+              items={masterDataItems}
+            />
           </SidebarGroupContent>
         </SidebarGroup>
 
