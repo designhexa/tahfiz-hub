@@ -70,8 +70,6 @@ const masterDataItems = [
   { title: "Pengumuman", url: "/pengumuman", icon: Megaphone },
 ];
 
-
-
 export function AppSidebar() {
   const { open } = useSidebar();
   const location = useLocation();
